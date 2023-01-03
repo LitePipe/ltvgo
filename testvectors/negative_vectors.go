@@ -62,6 +62,73 @@ func GenerateNegativeVectors(w io.Writer) {
 		}
 	}
 
+	// Truncated types
+	desc("Truncated u8")
+	e.WriteTag(ltv.U8, ltv.SizeSingle)
+	commit()
+
+	desc("Truncated u16")
+	e.WriteTag(ltv.U16, ltv.SizeSingle)
+	e.RawWriteByte(0)
+	commit()
+
+	desc("Truncated u32")
+	e.WriteTag(ltv.U32, ltv.SizeSingle)
+	e.RawWriteByte(1)
+	e.RawWriteByte(2)
+	commit()
+
+	desc("Truncated u64")
+	e.WriteTag(ltv.U64, ltv.SizeSingle)
+	e.RawWriteByte(1)
+	e.RawWriteByte(2)
+	e.RawWriteByte(3)
+	e.RawWriteByte(4)
+	e.RawWriteByte(5)
+	e.RawWriteByte(6)
+	e.RawWriteByte(7)
+	commit()
+
+	desc("Truncated i8")
+	e.WriteTag(ltv.I8, ltv.SizeSingle)
+	commit()
+
+	desc("Truncated i16")
+	e.WriteTag(ltv.I16, ltv.SizeSingle)
+	commit()
+
+	desc("Truncated i32")
+	e.WriteTag(ltv.I32, ltv.SizeSingle)
+	e.RawWriteByte(1)
+	e.RawWriteByte(2)
+	e.RawWriteByte(3)
+	commit()
+
+	desc("Truncated i64")
+	e.WriteTag(ltv.I64, ltv.SizeSingle)
+	e.RawWriteByte(1)
+	e.RawWriteByte(2)
+	e.RawWriteByte(3)
+	e.RawWriteByte(4)
+	e.RawWriteByte(5)
+	e.RawWriteByte(6)
+	commit()
+
+	desc("Truncated f32")
+	e.WriteTag(ltv.F32, ltv.SizeSingle)
+	e.RawWriteByte(1)
+	commit()
+
+	desc("Truncated f64")
+	e.WriteTag(ltv.F64, ltv.SizeSingle)
+	e.RawWriteByte(1)
+	e.RawWriteByte(2)
+	e.RawWriteByte(3)
+	e.RawWriteByte(4)
+	e.RawWriteByte(5)
+	e.RawWriteByte(6)
+	commit()
+
 	// Truncated messages
 	desc("Truncated []f32 length")
 	e.WriteTag(ltv.F32, ltv.Size2)
@@ -85,17 +152,6 @@ func GenerateNegativeVectors(w io.Writer) {
 	e.WriteListStart()
 	e.WriteU8(1)
 	e.WriteU8(2)
-	commit()
-
-	desc("Truncated u64 (off by one)")
-	e.WriteTag(ltv.U64, ltv.SizeSingle)
-	e.RawWriteByte(1)
-	e.RawWriteByte(2)
-	e.RawWriteByte(3)
-	e.RawWriteByte(4)
-	e.RawWriteByte(5)
-	e.RawWriteByte(6)
-	e.RawWriteByte(7)
 	commit()
 
 	desc("Truncated struct {'a': <nop><nop>")
@@ -228,6 +284,7 @@ func GenerateNegativeVectors(w io.Writer) {
 	e.WriteStructStart()
 	e.WriteString("0")
 	e.WriteListStart()
+	e.WriteString("0")
 	e.WriteTag(ltv.String, ltv.Size1)
 	e.RawWriteByte(0x30)
 	e.RawWriteByte(0x00)

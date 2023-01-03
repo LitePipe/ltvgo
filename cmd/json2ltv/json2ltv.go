@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	hexEncoded := flag.Bool("x", false, "hex encoded input")
+	hexEncoded := flag.Bool("x", false, "hex encoded output")
 	inputFile := flag.String("i", "", "read input from file")
 	outputFile := flag.String("o", "", "write output to file")
 	flag.Parse()

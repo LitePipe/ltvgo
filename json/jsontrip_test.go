@@ -40,8 +40,6 @@ func TestBasicRoundTrip(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	//fmt.Println(jsBuf.String())
 }
 
 func TestExtendedTrip(t *testing.T) {
@@ -59,22 +57,22 @@ func TestExtendedTrip(t *testing.T) {
 		F32  float32
 		F64  float64
 		//F64_nan float64
-		//F64_inf float64
-		Str   string
-		Bytes []byte
-		Bools []bool
-		I8s   []int8
-		I16s  []int16
-		I32s  []int32
-		I64s  []int64
-		U8s   []uint8
-		U16s  []uint16
-		U32s  []uint32
-		U64s  []uint64
-		F32s  []float32
-		F64s  []float64
-		List  []any
-		Map   map[string]interface{}
+		F64_inf float64
+		Str     string
+		Bytes   []byte
+		Bools   []bool
+		I8s     []int8
+		I16s    []int16
+		I32s    []int32
+		I64s    []int64
+		U8s     []uint8
+		U16s    []uint16
+		U32s    []uint32
+		U64s    []uint64
+		F32s    []float32
+		F64s    []float64
+		List    []any
+		Map     map[string]interface{}
 	}
 
 	v1 := LtvCheck{
@@ -91,22 +89,22 @@ func TestExtendedTrip(t *testing.T) {
 		F32:  123.456,
 		F64:  789.101112,
 		//F64_nan: math.NaN(),
-		//F64_inf: math.Inf(1),
-		Str:   "This is a string",
-		Bytes: []byte("These are bytes"),
-		Bools: []bool{true, true, false, false},
-		I8s:   []int8{1, 2, 3},
-		I16s:  []int16{1, 2, 3},
-		I32s:  []int32{1, 2, 3},
-		I64s:  []int64{1, 2, 3},
-		U8s:   []uint8{1, 2, 3},
-		U16s:  []uint16{1, 2, 3},
-		U32s:  []uint32{1, 2, 3},
-		U64s:  []uint64{1, 2, 3},
-		F32s:  []float32{1.1, 2.2, 3.3},
-		F64s:  []float64{1.1, 2.2, 3.3},
-		List:  []any{"Bob", "the", 7, "builder"},
-		Map:   map[string]interface{}{"Bill": "Ted", "Sulu": 7},
+		F64_inf: math.Inf(1),
+		Str:     "This is a string",
+		Bytes:   []byte("These are bytes"),
+		Bools:   []bool{true, true, false, false},
+		I8s:     []int8{1, 2, 3},
+		I16s:    []int16{1, 2, 3},
+		I32s:    []int32{1, 2, 3},
+		I64s:    []int64{1, 2, 3},
+		U8s:     []uint8{1, 2, 3},
+		U16s:    []uint16{1, 2, 3},
+		U32s:    []uint32{1, 2, 3},
+		U64s:    []uint64{1, 2, 3},
+		F32s:    []float32{1.1, 2.2, 3.3},
+		F64s:    []float64{1.1, 2.2, 3.3},
+		List:    []any{"Bob", "the", 7, "builder"},
+		Map:     map[string]interface{}{"Bill": "Ted", "Sulu": 7},
 	}
 
 	// Serialize -> LTV

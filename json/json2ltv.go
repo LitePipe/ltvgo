@@ -72,8 +72,6 @@ func Json2Ltv(r io.Reader, w io.Writer) error {
 				e.WriteInt(val)
 			case uint64:
 				e.WriteUint(val)
-			// case []byte:
-			// 	e.WriteBytes(val)
 			default:
 				e.WriteString(token)
 			}
@@ -107,7 +105,6 @@ func Json2Ltv(r io.Reader, w io.Writer) error {
 
 func writeGoldiAsList(lst *GoldiList, e *ltv.Encoder) {
 	e.WriteListStart()
-	//e.WriteTag(ltv.List)
 
 	switch data := lst.data.(type) {
 	case nil:

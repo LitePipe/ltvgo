@@ -785,9 +785,6 @@ func floatVectorConv(dst reflect.Value, src any) any {
 	}
 }
 
-// A slow, messy, allocating process of shoehorning a integer vector
-// into a Go integer vector of another type.
-// This could probably be optimized quite a bit. The best way: don't do it.
 func vectorConv(dst reflect.Value, src any) any {
 
 	srcType := reflect.TypeOf(src)

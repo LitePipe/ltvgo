@@ -380,6 +380,26 @@ invalid tag - typeCode: 15, sizeCode: 14
 fe
 invalid tag - typeCode: 15, sizeCode: 15
 ff
+Truncated u8
+60
+Truncated u16
+7000
+Truncated u32
+800102
+Truncated u64
+9001020304050607
+Truncated i8
+a0
+Truncated i16
+b0
+Truncated i32
+c0010203
+Truncated i64
+d0010203040506
+Truncated f32
+e001
+Truncated f64
+f0010203040506
 Truncated []f32 length
 e263
 Truncated []f32
@@ -388,8 +408,6 @@ Truncated struct {'a':
 104061
 Truncated list [1, 2 
 2060016002
-Truncated u64 (off by one)
-9001020304050607
 Truncated struct {'a': <nop><nop>
 1040610f0f
 Invalid UTF-8 (first byte)
@@ -429,4 +447,4 @@ struct: {'':5} (zero length struct key)
 struct: {5:'five'} (non-string struct key)
 10600541046669766530
 struct: {'0':['0', <corrupt string>
-10403020413000
+104030204030413000

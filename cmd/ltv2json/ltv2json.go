@@ -9,7 +9,7 @@ import (
 	"io"
 	"os"
 
-	ltvjs "litevectors.io/ltvgo/json"
+	ltvjs "github.com/ThadThompson/ltvgo"
 )
 
 func main() {

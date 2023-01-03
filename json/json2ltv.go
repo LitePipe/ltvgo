@@ -6,7 +6,7 @@ import (
 	"math"
 	"strconv"
 
-	ltv "litevectors.io/ltvgo"
+	ltv "github.com/ThadThompson/ltvgo"
 )
 
 // Streaming JSON to LiteVector transcoder.

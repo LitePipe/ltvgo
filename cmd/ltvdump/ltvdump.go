@@ -13,7 +13,7 @@ import (
 	"os"
 	"strings"
 
-	ltv "litevectors.io/ltvgo"
+	ltv "github.com/ThadThompson/ltvgo"
 )
 
 func abort(msg string) {

@@ -7,7 +7,7 @@ import (
 	"io"
 	"testing"
 
-	ltv "litevectors.io/ltvgo"
+	ltv "github.com/ThadThompson/ltvgo"
 )
 
 func loadTestVectorForFuzzing(f *testing.F, r io.Reader) {

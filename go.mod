@@ -1,3 +1,3 @@
-module litevectors.io/ltvgo
+module github.com/ThadThompson/ltvgo
 
 go 1.19

@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"testing"
 
-	ltv "litevectors.io/ltvgo"
+	ltv "github.com/ThadThompson/ltvgo"
 )
 
 func TestBasicRoundTrip(t *testing.T) {

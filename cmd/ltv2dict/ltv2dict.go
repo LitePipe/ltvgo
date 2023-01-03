@@ -11,7 +11,7 @@ import (
 	"os"
 	"strings"
 
-	ltv "litevectors.io/ltvgo"
+	ltv "github.com/ThadThompson/ltvgo"
 )
 
 // Pull the set of deduplicated struct keys from a LiteVector stream.

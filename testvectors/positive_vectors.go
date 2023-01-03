@@ -7,8 +7,8 @@ import (
 	"io"
 	"math"
 
-	ltv "litevectors.io/ltvgo"
-	ltvjs "litevectors.io/ltvgo/json"
+	ltv "github.com/ThadThompson/ltvgo"
+	ltvjs "github.com/ThadThompson/ltvgo/json"
 )
 
 func GeneratePositiveVectors(w io.Writer) {

@@ -7,7 +7,7 @@ import (
 	"io"
 	"math"
 
-	ltv "litevectors.io/ltvgo"
+	ltv "github.com/ThadThompson/ltvgo"
 )
 
 const indent = "    "

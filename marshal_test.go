@@ -134,24 +134,6 @@ func TestRoundMap(t *testing.T) {
 	}
 }
 
-func assertEqual[K comparable](t *testing.T, tag string, a K, b K) {
-	if a != b {
-		t.Fatal("Comparison failed: " + tag)
-	}
-}
-
-func assertEqualSlice[K comparable](t *testing.T, tag string, a []K, b []K) {
-	if len(a) != len(b) {
-		t.Fatal("Comparison failed: " + tag)
-	}
-
-	for i, v := range a {
-		if v != b[i] {
-			t.Fatal("Comparison failed: " + tag)
-		}
-	}
-}
-
 func TestRoundStruct(t *testing.T) {
 	type LtvCheck struct {
 		Nil  *byte
@@ -167,22 +149,22 @@ func TestRoundStruct(t *testing.T) {
 		F32  float32
 		F64  float64
 		//F64_nan float64
-		//F64_inf float64
-		Str   string
-		Bytes []byte
-		Bools []bool
-		I8s   []int8
-		I16s  []int16
-		I32s  []int32
-		I64s  []int64
-		U8s   []uint8
-		U16s  []uint16
-		U32s  []uint32
-		U64s  []uint64
-		F32s  []float32
-		F64s  []float64
-		List  []any
-		Map   map[string]interface{}
+		F64_inf float64
+		Str     string
+		Bytes   []byte
+		Bools   []bool
+		I8s     []int8
+		I16s    []int16
+		I32s    []int32
+		I64s    []int64
+		U8s     []uint8
+		U16s    []uint16
+		U32s    []uint32
+		U64s    []uint64
+		F32s    []float32
+		F64s    []float64
+		List    []any
+		Map     map[string]interface{}
 	}
 
 	v1 := LtvCheck{
@@ -199,22 +181,22 @@ func TestRoundStruct(t *testing.T) {
 		F32:  123.456,
 		F64:  789.101112,
 		//F64_nan: math.NaN(),
-		//F64_inf: math.Inf(1),
-		Str:   "This is a string",
-		Bytes: []byte("These are bytes"),
-		Bools: []bool{true, true, false, false},
-		I8s:   []int8{1, 2, 3},
-		I16s:  []int16{1, 2, 3},
-		I32s:  []int32{1, 2, 3},
-		I64s:  []int64{1, 2, 3},
-		U8s:   []uint8{1, 2, 3},
-		U16s:  []uint16{1, 2, 3},
-		U32s:  []uint32{1, 2, 3},
-		U64s:  []uint64{1, 2, 3},
-		F32s:  []float32{1.1, 2.2, 3.3},
-		F64s:  []float64{1.1, 2.2, 3.3},
-		List:  []any{"Bob", "the", 7, "builder"},
-		Map:   map[string]interface{}{"Bill": "Ted", "Sulu": 7},
+		F64_inf: math.Inf(1),
+		Str:     "This is a string",
+		Bytes:   []byte("These are bytes"),
+		Bools:   []bool{true, true, false, false},
+		I8s:     []int8{1, 2, 3},
+		I16s:    []int16{1, 2, 3},
+		I32s:    []int32{1, 2, 3},
+		I64s:    []int64{1, 2, 3},
+		U8s:     []uint8{1, 2, 3},
+		U16s:    []uint16{1, 2, 3},
+		U32s:    []uint32{1, 2, 3},
+		U64s:    []uint64{1, 2, 3},
+		F32s:    []float32{1.1, 2.2, 3.3},
+		F64s:    []float64{1.1, 2.2, 3.3},
+		List:    []any{"Bob", "the", 7, "builder"},
+		Map:     map[string]interface{}{"Bill": "Ted", "Sulu": 7},
 	}
 
 	enc, err := Marshal(&v1)
@@ -230,46 +212,10 @@ func TestRoundStruct(t *testing.T) {
 	}
 
 	// Full struct check
+	// Notice that DeepEqual will fail comparing floating point NaN values
+	// because NaN is defined to not equal any other number or itself.
 	if !reflect.DeepEqual(v1, v2) {
 		t.Fatal("v1 and v2 are not DeepEqual")
-	}
-
-	assertEqual(t, "Nil", v1.Nil, v2.Nil)
-	assertEqual(t, "Bool", v1.Bool, v2.Bool)
-
-	assertEqual(t, "U8", v1.U8, v2.U8)
-	assertEqual(t, "U16", v1.U16, v2.U16)
-	assertEqual(t, "U32", v1.U32, v2.U32)
-	assertEqual(t, "U64", v1.U64, v2.U64)
-
-	assertEqual(t, "I8", v1.I8, v2.I8)
-	assertEqual(t, "I16", v1.I16, v2.I16)
-	assertEqual(t, "I32", v1.I32, v2.I32)
-	assertEqual(t, "I64", v1.I64, v2.I64)
-
-	assertEqual(t, "Str", v1.Str, v2.Str)
-
-	assertEqualSlice(t, "Bytes", v1.Bytes, v2.Bytes)
-	assertEqualSlice(t, "Bools", v1.Bools, v2.Bools)
-
-	assertEqualSlice(t, "U8s", v1.U8s, v2.U8s)
-	assertEqualSlice(t, "U16s", v1.U16s, v2.U16s)
-	assertEqualSlice(t, "U32s", v1.U32s, v2.U32s)
-	assertEqualSlice(t, "U64s", v1.U64s, v2.U64s)
-
-	assertEqualSlice(t, "I8s", v1.I8s, v2.I8s)
-	assertEqualSlice(t, "I16s", v1.I16s, v2.I16s)
-	assertEqualSlice(t, "I32s", v1.I32s, v2.I32s)
-	assertEqualSlice(t, "I64s", v1.I64s, v2.I64s)
-
-	for i, val := range v1.List {
-		if v2.List[i] != val {
-			t.Fatal("List roundtrip failed on element ", i, val)
-		}
-	}
-
-	if v1.Map["Bill"] != v2.Map["Bill"] {
-		t.Fatal("Map roundtrip failed")
 	}
 }
 

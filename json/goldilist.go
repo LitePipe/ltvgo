@@ -126,15 +126,15 @@ func (l *GoldiList) appendDelimiter(token json.Delim) {
 		// TODO: When implementing advanced vector support in the standard library,
 		// remove the above early return, and allow this process to continue.
 
-		l.count_stack = append(l.count_stack, l.count)
-		l.count = 0
+		// l.count_stack = append(l.count_stack, l.count)
+		// l.count = 0
 
-		// Shape stays one level longer than the count stack
-		if len(l.count_stack) == len(l.shape) {
-			l.shape = append(l.shape, 0)
-		}
+		// // Shape stays one level longer than the count stack
+		// if len(l.count_stack) == len(l.shape) {
+		// 	l.shape = append(l.shape, 0)
+		// }
 
-		return
+		// return
 	}
 
 	if token == json.Delim(']') {

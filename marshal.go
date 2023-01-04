@@ -10,7 +10,6 @@
 package ltvgo
 
 import (
-	"bytes"
 	"encoding"
 	"fmt"
 	"reflect"
@@ -29,7 +28,7 @@ func Marshal(v any) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	buf := append([]byte(nil), e.buf.Bytes()...)
+	buf := append([]byte(nil), e.l.Bytes()...)
 
 	return buf, nil
 }
@@ -81,8 +80,8 @@ func (e *MarshalerError) Unwrap() error { return e.Err }
 
 // An encodeState encodes LiteVectors into a bytes.Buffer.
 type encodeState struct {
-	l   *StreamEncoder
-	buf *bytes.Buffer // accumulated output
+	l Encoder
+	//buf *bytes.Buffer // accumulated output
 
 	// Keep track of what pointers we've seen in the current recursive call
 	// path, to avoid cycles that could lead to a stack overflow. Only do
@@ -101,8 +100,9 @@ func newEncodeState() *encodeState {
 	if v := encodeStatePool.Get(); v != nil {
 		e := v.(*encodeState)
 
-		e.buf.Reset()
-		e.l = NewStreamEncoder(e.buf)
+		e.l.Reset()
+		// e.buf.Reset()
+		// e.l = NewStreamEncoder(e.buf)
 		if len(e.ptrSeen) > 0 {
 			panic("ptrEncoder.encode should have emptied ptrSeen via defers")
 		}
@@ -110,8 +110,7 @@ func newEncodeState() *encodeState {
 		return e
 	}
 
-	var buf bytes.Buffer
-	return &encodeState{l: NewStreamEncoder(&buf), buf: &buf, ptrSeen: make(map[any]struct{})}
+	return &encodeState{ptrSeen: make(map[any]struct{})}
 }
 
 // ltvError is an error wrapper type for internal use only.
@@ -282,7 +281,7 @@ func marshalerEncoder(e *encodeState, v reflect.Value, opts encOpts) {
 		return
 	}
 
-	e.l.RawWrite(b)
+	e.l.Write(b)
 }
 
 func addrMarshalerEncoder(e *encodeState, v reflect.Value, opts encOpts) {
@@ -301,7 +300,7 @@ func addrMarshalerEncoder(e *encodeState, v reflect.Value, opts encOpts) {
 		return
 	}
 
-	e.l.RawWrite(b)
+	e.l.Write(b)
 }
 
 func textMarshalerEncoder(e *encodeState, v reflect.Value, opts encOpts) {

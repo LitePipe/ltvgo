@@ -16,7 +16,7 @@ func GeneratePositiveVectors(w io.Writer) {
 	// Setup
 	var descBuf bytes.Buffer
 	var dataBuf bytes.Buffer
-	e := ltv.NewEncoder(&dataBuf)
+	e := ltv.NewStreamEncoder(&dataBuf)
 
 	desc := func(s string) {
 		descBuf.WriteString(s)

@@ -11,7 +11,6 @@ import (
 type LtvElementRole int
 
 const defaultMaxValueLen = 1024 * 1024
-const defaultBufferSize = 64
 
 const (
 	RoleValue LtvElementRole = iota

@@ -49,7 +49,7 @@ func ltv2Dict(r io.Reader, w io.Writer) error {
 	}
 
 	// Write the keys as full LiteVector string elements
-	e := ltv.NewEncoder(w)
+	e := ltv.NewStreamEncoder(w)
 	for key, _ := range keySet {
 		e.WriteString(key)
 	}

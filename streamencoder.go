@@ -30,34 +30,34 @@ func fitStorageExponent(v uint64) uint8 {
 	}
 }
 
-type Encoder struct {
+type StreamEncoder struct {
 	w       io.Writer
 	offset  int
 	Werr    error
 	scratch [8]byte
 }
 
-func NewEncoder(w io.Writer) *Encoder {
-	return &Encoder{
+func NewStreamEncoder(w io.Writer) *StreamEncoder {
+	return &StreamEncoder{
 		w:    w,
 		Werr: nil,
 	}
 }
 
 // Reset the error state and offset of the encoder.
-func (e *Encoder) Reset() {
+func (e *StreamEncoder) Reset() {
 	e.offset = 0
 	e.Werr = nil
 }
 
 // Manually set the "offset" of the stream encoder.
-func (e *Encoder) SetOffset(offset int) {
+func (e *StreamEncoder) SetOffset(offset int) {
 	e.offset = offset
 }
 
 // Passthrough write a byte array to the underlying writer
 // with error caching and offset tracking.
-func (e *Encoder) RawWrite(b []byte) {
+func (e *StreamEncoder) RawWrite(b []byte) {
 
 	// Abort any writes if there is already an error in the stream.
 	if e.Werr != nil {
@@ -72,35 +72,35 @@ func (e *Encoder) RawWrite(b []byte) {
 }
 
 // Passthrough write byte
-func (e *Encoder) RawWriteByte(v byte) {
+func (e *StreamEncoder) RawWriteByte(v byte) {
 	e.scratch[0] = v
 	e.RawWrite(e.scratch[:1])
 }
 
 // Passthrough write Uint16 endian corrected
-func (e *Encoder) RawWriteUint16(v uint16) {
+func (e *StreamEncoder) RawWriteUint16(v uint16) {
 	binary.LittleEndian.PutUint16(e.scratch[:], v)
 	e.RawWrite(e.scratch[0:2])
 }
 
 // Passthrough write Uint32, endian corrected
-func (e *Encoder) RawWriteUint32(v uint32) {
+func (e *StreamEncoder) RawWriteUint32(v uint32) {
 	binary.LittleEndian.PutUint32(e.scratch[:], v)
 	e.RawWrite(e.scratch[0:4])
 }
 
 // Passthrough write Uint64, endian corrected
-func (e *Encoder) RawWriteUint64(v uint64) {
+func (e *StreamEncoder) RawWriteUint64(v uint64) {
 	binary.LittleEndian.PutUint64(e.scratch[:], v)
 	e.RawWrite(e.scratch[0:8])
 }
 
-func (e *Encoder) WriteTag(t TypeCode, s SizeCode) {
+func (e *StreamEncoder) WriteTag(t TypeCode, s SizeCode) {
 	e.RawWriteByte((byte(t) << 4) | byte(s))
 }
 
 // Write the tag and length for a typed vector.
-func (e *Encoder) WriteVectorPrefix(t TypeCode, count int) {
+func (e *StreamEncoder) WriteVectorPrefix(t TypeCode, count int) {
 
 	typeSize := typeSizes[t]
 	bufLen := uint64(typeSize * count)
@@ -133,31 +133,31 @@ func (e *Encoder) WriteVectorPrefix(t TypeCode, count int) {
 	}
 }
 
-func (e *Encoder) WriteNop() {
+func (e *StreamEncoder) WriteNop() {
 	e.RawWriteByte(NopTag)
 }
 
-func (e *Encoder) WriteNil() {
+func (e *StreamEncoder) WriteNil() {
 	e.WriteTag(Nil, SizeSingle)
 }
 
-func (e *Encoder) WriteStructStart() {
+func (e *StreamEncoder) WriteStructStart() {
 	e.WriteTag(Struct, SizeSingle)
 }
 
-func (e *Encoder) WriteStructEnd() {
+func (e *StreamEncoder) WriteStructEnd() {
 	e.WriteTag(End, SizeSingle)
 }
 
-func (e *Encoder) WriteListStart() {
+func (e *StreamEncoder) WriteListStart() {
 	e.WriteTag(List, SizeSingle)
 }
 
-func (e *Encoder) WriteListEnd() {
+func (e *StreamEncoder) WriteListEnd() {
 	e.WriteTag(End, SizeSingle)
 }
 
-func (e *Encoder) WriteBool(v bool) {
+func (e *StreamEncoder) WriteBool(v bool) {
 	e.WriteTag(Bool, SizeSingle)
 
 	if v {
@@ -167,57 +167,57 @@ func (e *Encoder) WriteBool(v bool) {
 	}
 }
 
-func (e *Encoder) WriteI8(v int8) {
+func (e *StreamEncoder) WriteI8(v int8) {
 	e.WriteTag(I8, SizeSingle)
 	e.RawWriteByte(uint8(v))
 }
 
-func (e *Encoder) WriteI16(v int16) {
+func (e *StreamEncoder) WriteI16(v int16) {
 	e.WriteTag(I16, SizeSingle)
 	e.RawWriteUint16(uint16(v))
 }
 
-func (e *Encoder) WriteI32(v int32) {
+func (e *StreamEncoder) WriteI32(v int32) {
 	e.WriteTag(I32, SizeSingle)
 	e.RawWriteUint32(uint32(v))
 }
 
-func (e *Encoder) WriteI64(v int64) {
+func (e *StreamEncoder) WriteI64(v int64) {
 	e.WriteTag(I64, SizeSingle)
 	e.RawWriteUint64(uint64(v))
 }
 
-func (e *Encoder) WriteU8(v uint8) {
+func (e *StreamEncoder) WriteU8(v uint8) {
 	e.WriteTag(U8, SizeSingle)
 	e.RawWriteByte(v)
 }
 
-func (e *Encoder) WriteU16(v uint16) {
+func (e *StreamEncoder) WriteU16(v uint16) {
 	e.WriteTag(U16, SizeSingle)
 	e.RawWriteUint16(v)
 }
 
-func (e *Encoder) WriteU32(v uint32) {
+func (e *StreamEncoder) WriteU32(v uint32) {
 	e.WriteTag(U32, SizeSingle)
 	e.RawWriteUint32(v)
 }
 
-func (e *Encoder) WriteU64(v uint64) {
+func (e *StreamEncoder) WriteU64(v uint64) {
 	e.WriteTag(U64, SizeSingle)
 	e.RawWriteUint64(v)
 }
 
-func (e *Encoder) WriteF32(v float32) {
+func (e *StreamEncoder) WriteF32(v float32) {
 	e.WriteTag(F32, SizeSingle)
 	e.RawWriteUint32(math.Float32bits(v))
 }
 
-func (e *Encoder) WriteF64(v float64) {
+func (e *StreamEncoder) WriteF64(v float64) {
 	e.WriteTag(F64, SizeSingle)
 	e.RawWriteUint64(math.Float64bits(v))
 }
 
-func (e *Encoder) WriteInt(v int64) {
+func (e *StreamEncoder) WriteInt(v int64) {
 	// Goldilocks fit
 	if v >= 0 {
 		// Positive
@@ -238,7 +238,7 @@ func (e *Encoder) WriteInt(v int64) {
 	}
 }
 
-func (e *Encoder) WriteUint(v uint64) {
+func (e *StreamEncoder) WriteUint(v uint64) {
 	// Goldilocks fit
 	switch {
 	case v&u8Mask == 0:
@@ -254,7 +254,7 @@ func (e *Encoder) WriteUint(v uint64) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-func (e *Encoder) WriteString(s string) {
+func (e *StreamEncoder) WriteString(s string) {
 
 	// Validation up front
 	if !utf8.ValidString(s) {
@@ -270,7 +270,7 @@ func (e *Encoder) WriteString(s string) {
 	}
 }
 
-func (e *Encoder) WriteVecBool(v []bool) {
+func (e *StreamEncoder) WriteVecBool(v []bool) {
 	e.WriteVectorPrefix(Bool, len(v))
 	for _, v := range v {
 		if v {
@@ -281,70 +281,70 @@ func (e *Encoder) WriteVecBool(v []bool) {
 	}
 }
 
-func (e *Encoder) WriteVecU8(v []uint8) {
+func (e *StreamEncoder) WriteVecU8(v []uint8) {
 	e.WriteVectorPrefix(U8, len(v))
 	for _, val := range v {
 		e.RawWriteByte(byte(val))
 	}
 }
 
-func (e *Encoder) WriteVecU16(v []uint16) {
+func (e *StreamEncoder) WriteVecU16(v []uint16) {
 	e.WriteVectorPrefix(U16, len(v))
 	for _, val := range v {
 		e.RawWriteUint16(val)
 	}
 }
 
-func (e *Encoder) WriteVecU32(v []uint32) {
+func (e *StreamEncoder) WriteVecU32(v []uint32) {
 	e.WriteVectorPrefix(U32, len(v))
 	for _, val := range v {
 		e.RawWriteUint32(val)
 	}
 }
 
-func (e *Encoder) WriteVecU64(v []uint64) {
+func (e *StreamEncoder) WriteVecU64(v []uint64) {
 	e.WriteVectorPrefix(U64, len(v))
 	for _, val := range v {
 		e.RawWriteUint64(val)
 	}
 }
 
-func (e *Encoder) WriteVecI8(v []int8) {
+func (e *StreamEncoder) WriteVecI8(v []int8) {
 	e.WriteVectorPrefix(I8, len(v))
 	for _, val := range v {
 		e.RawWriteByte(byte(val))
 	}
 }
 
-func (e *Encoder) WriteVecI16(v []int16) {
+func (e *StreamEncoder) WriteVecI16(v []int16) {
 	e.WriteVectorPrefix(I16, len(v))
 	for _, val := range v {
 		e.RawWriteUint16(uint16(val))
 	}
 }
 
-func (e *Encoder) WriteVecI32(v []int32) {
+func (e *StreamEncoder) WriteVecI32(v []int32) {
 	e.WriteVectorPrefix(I32, len(v))
 	for _, val := range v {
 		e.RawWriteUint32(uint32(val))
 	}
 }
 
-func (e *Encoder) WriteVecI64(v []int64) {
+func (e *StreamEncoder) WriteVecI64(v []int64) {
 	e.WriteVectorPrefix(I64, len(v))
 	for _, val := range v {
 		e.RawWriteUint64(uint64(val))
 	}
 }
 
-func (e *Encoder) WriteVecF32(v []float32) {
+func (e *StreamEncoder) WriteVecF32(v []float32) {
 	e.WriteVectorPrefix(F32, len(v))
 	for _, val := range v {
 		e.RawWriteUint32(math.Float32bits(val))
 	}
 }
 
-func (e *Encoder) WriteVecF64(v []float64) {
+func (e *StreamEncoder) WriteVecF64(v []float64) {
 	e.WriteVectorPrefix(F64, len(v))
 	for _, val := range v {
 		e.RawWriteUint64(math.Float64bits(val))

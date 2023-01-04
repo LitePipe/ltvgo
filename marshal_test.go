@@ -226,7 +226,7 @@ type selfMarshaller struct {
 
 func (m *selfMarshaller) MarshalLTV() ([]byte, error) {
 	var dataBuf bytes.Buffer
-	e := NewEncoder(&dataBuf)
+	e := NewStreamEncoder(&dataBuf)
 
 	e.WriteStructStart()
 

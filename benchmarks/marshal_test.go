@@ -123,18 +123,18 @@ func benchUnmarshalJson[T TestObject](value T, b *testing.B) {
 	}
 }
 
-func Benchmark_Marshal_Small_Ltv(b *testing.B)  { benchMarshalLtv(smallData, b) }
-func Benchmark_Marshal_Medium_Ltv(b *testing.B) { benchMarshalLtv(medData, b) }
-func Benchmark_Marshal_Large_Ltv(b *testing.B)  { benchMarshalLtv(largeData, b) }
+func Benchmark_Ltv_Marshal_Small(b *testing.B)  { benchMarshalLtv(smallData, b) }
+func Benchmark_Ltv_Marshal_Medium(b *testing.B) { benchMarshalLtv(medData, b) }
+func Benchmark_Ltv_Marshal_Large(b *testing.B)  { benchMarshalLtv(largeData, b) }
 
-func Benchmark_Unmarshal_Small_LTV(b *testing.B)  { benchUnmarshalLtv(smallData, b) }
-func Benchmark_Unmarshal_Medium_Ltv(b *testing.B) { benchUnmarshalLtv(medData, b) }
-func Benchmark_Unmarshal_Large_Ltv(b *testing.B)  { benchUnmarshalLtv(largeData, b) }
+func Benchmark_Ltv_Unmarshal_Small(b *testing.B)  { benchUnmarshalLtv(smallData, b) }
+func Benchmark_Ltv_Unmarshal_Medium(b *testing.B) { benchUnmarshalLtv(medData, b) }
+func Benchmark_Ltv_Unmarshal_Large(b *testing.B)  { benchUnmarshalLtv(largeData, b) }
 
-func Benchmark_Marshal_Small_Json(b *testing.B)  { benchMarshalJson(smallData, b) }
-func Benchmark_Marshal_Medium_Json(b *testing.B) { benchMarshalJson(medData, b) }
-func Benchmark_Marshal_Large_Json(b *testing.B)  { benchMarshalJson(largeData, b) }
+func Benchmark_Json_Marshal_Small(b *testing.B)  { benchMarshalJson(smallData, b) }
+func Benchmark_Json_Marshal_Medium(b *testing.B) { benchMarshalJson(medData, b) }
+func Benchmark_Json_Marshal_Large(b *testing.B)  { benchMarshalJson(largeData, b) }
 
-func Benchmark_Unmarshal_Small_Json(b *testing.B)  { benchUnmarshalJson(smallData, b) }
-func Benchmark_Unmarshal_Medium_Json(b *testing.B) { benchUnmarshalJson(medData, b) }
-func Benchmark_Unmarshal_Large_Json(b *testing.B)  { benchUnmarshalJson(largeData, b) }
+func Benchmark_Json_Unmarshal_Small(b *testing.B)  { benchUnmarshalJson(smallData, b) }
+func Benchmark_Json_Unmarshal_Medium(b *testing.B) { benchUnmarshalJson(medData, b) }
+func Benchmark_Json_Unmarshal_Large(b *testing.B)  { benchUnmarshalJson(largeData, b) }

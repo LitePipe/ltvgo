@@ -76,7 +76,7 @@ func (s *LtvStruct) String() string {
 // Serialize to a LiteVectors with ordered keys
 func (s *LtvStruct) MarshalLTV() ([]byte, error) {
 	var dataBuf bytes.Buffer
-	e := NewEncoder(&dataBuf)
+	e := NewStreamEncoder(&dataBuf)
 
 	e.WriteStructStart()
 	for _, key := range s.keys {

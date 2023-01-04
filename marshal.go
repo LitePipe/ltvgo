@@ -81,7 +81,7 @@ func (e *MarshalerError) Unwrap() error { return e.Err }
 
 // An encodeState encodes LiteVectors into a bytes.Buffer.
 type encodeState struct {
-	l   *Encoder
+	l   *StreamEncoder
 	buf *bytes.Buffer // accumulated output
 
 	// Keep track of what pointers we've seen in the current recursive call
@@ -102,7 +102,7 @@ func newEncodeState() *encodeState {
 		e := v.(*encodeState)
 
 		e.buf.Reset()
-		e.l = NewEncoder(e.buf)
+		e.l = NewStreamEncoder(e.buf)
 		if len(e.ptrSeen) > 0 {
 			panic("ptrEncoder.encode should have emptied ptrSeen via defers")
 		}
@@ -111,7 +111,7 @@ func newEncodeState() *encodeState {
 	}
 
 	var buf bytes.Buffer
-	return &encodeState{l: NewEncoder(&buf), buf: &buf, ptrSeen: make(map[any]struct{})}
+	return &encodeState{l: NewStreamEncoder(&buf), buf: &buf, ptrSeen: make(map[any]struct{})}
 }
 
 // ltvError is an error wrapper type for internal use only.

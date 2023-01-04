@@ -12,7 +12,7 @@ import (
 // Streaming JSON to LiteVector transcoder.
 func Json2Ltv(r io.Reader, w io.Writer) error {
 
-	e := ltv.NewEncoder(w)
+	e := ltv.NewStreamEncoder(w)
 	dec := json.NewDecoder(r)
 	dec.UseNumber()
 
@@ -103,7 +103,7 @@ func Json2Ltv(r io.Reader, w io.Writer) error {
 	return nil
 }
 
-func writeGoldiAsList(lst *GoldiList, e *ltv.Encoder) {
+func writeGoldiAsList(lst *GoldiList, e *ltv.StreamEncoder) {
 	e.WriteListStart()
 
 	switch data := lst.data.(type) {
@@ -130,7 +130,7 @@ func writeGoldiAsList(lst *GoldiList, e *ltv.Encoder) {
 }
 
 // Write a GoldiList as a strongly typed buffer (or buffer struct)
-func writeGoldiAsVector(lst *GoldiList, e *ltv.Encoder) {
+func writeGoldiAsVector(lst *GoldiList, e *ltv.StreamEncoder) {
 
 	switch data := lst.data.(type) {
 	case nil:

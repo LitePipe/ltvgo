@@ -10,15 +10,16 @@ import (
 )
 
 var (
-	errBadSizeCode      = errors.New("ltv: size code out of range")
-	errBadUtf8          = errors.New("ltv: string with invalid UTF-8 data")
-	errBadKey           = errors.New("ltv: invalid struct key")
-	errInvalidVectorLen = errors.New("ltv: vector length invalid for data type")
-	errMaxNestingDepth  = errors.New("ltv: max nesting depth exceeded")
-	errNestingMismatch  = errors.New("ltv: mismatched struct/list end tags")
-	errDuplicateKey     = errors.New("ltv: duplicate struct key")
-	errExpectedValue    = errors.New("ltv: expected value")
-	errExpectedStruct   = errors.New("ltv: expected struct")
+	errBadSizeCode         = errors.New("ltv: size code out of range")
+	errBadUtf8             = errors.New("ltv: string with invalid UTF-8 data")
+	errBadKey              = errors.New("ltv: invalid struct key")
+	errInvalidVectorLen    = errors.New("ltv: vector length invalid for data type")
+	errMaxValueLenExceeded = errors.New("ltv: max value length exceeded")
+	errMaxNestingDepth     = errors.New("ltv: max nesting depth exceeded")
+	errNestingMismatch     = errors.New("ltv: mismatched struct/list end tags")
+	errDuplicateKey        = errors.New("ltv: duplicate struct key")
+	errExpectedValue       = errors.New("ltv: expected value")
+	errExpectedStruct      = errors.New("ltv: expected struct")
 )
 
 // Valid reports whether data is a valid LiteVector buffer.

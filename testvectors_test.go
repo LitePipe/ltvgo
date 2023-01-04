@@ -36,9 +36,20 @@ func processTestVectors(t *testing.T, r io.Reader, valid bool) {
 			t.Fatalf("Valid did not correctly validate for test vector %d: '%s'", testNumber, testDesc)
 		}
 
-		// Check single value decoder
-		var d Decoder
-		d.Init(data)
+		// Check []byte decoder
+		var bd Decoder
+		bd.Init(data)
+
+		_, err = bd.Value()
+		if valid && err != nil {
+			t.Fatalf("Decoder failed for test vector %d '%s' : %s", testNumber, testDesc, err)
+		} else if !valid && err == nil {
+			t.Fatalf("Decoder incorrectly decoded test vector %d '%s'", testNumber, testDesc)
+		}
+
+		// Check stream decoder
+		d := NewStreamDecoderBytes(data)
+
 		_, err = d.Value()
 		if valid && err != nil {
 			t.Fatalf("Decoder failed for test vector %d '%s' : %s", testNumber, testDesc, err)
@@ -46,7 +57,7 @@ func processTestVectors(t *testing.T, r io.Reader, valid bool) {
 			t.Fatalf("Decoder incorrectly decoded test vector %d '%s'", testNumber, testDesc)
 		}
 
-		// Check marshaling code
+		// Check marshaling
 		var val any
 		err = Unmarshal(data, &val)
 		if valid && err != nil {
@@ -55,7 +66,6 @@ func processTestVectors(t *testing.T, r io.Reader, valid bool) {
 			t.Fatalf("Unmarshal incorrectly decoded test vector %d '%s'", testNumber, testDesc)
 		}
 	}
-
 }
 
 func TestPositiveVectors(t *testing.T) {

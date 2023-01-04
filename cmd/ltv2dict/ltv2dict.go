@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"strings"
 
 	ltv "github.com/ThadThompson/ltvgo"
 )
@@ -19,8 +18,6 @@ func ltvKeys(r io.Reader) (map[string]struct{}, error) {
 
 	s := ltv.NewStreamDecoder(r)
 	keySet := make(map[string]struct{})
-
-	strBuilder := new(strings.Builder)
 
 	for {
 
@@ -33,14 +30,12 @@ func ltvKeys(r io.Reader) (map[string]struct{}, error) {
 		}
 
 		if d.Role == ltv.RoleStructKey {
-
-			// Read and set the string
-			strBuilder.Reset()
-			_, err := io.Copy(strBuilder, io.LimitReader(s, int64(d.Length)))
+			key, err := s.ReadValue(d)
 			if err != nil {
 				return nil, err
 			}
-			keySet[strBuilder.String()] = struct{}{}
+			keySet[key.(string)] = struct{}{}
+
 		} else {
 			s.SkipValue(d)
 		}

@@ -11,7 +11,6 @@ import (
 	"io"
 	"math"
 	"os"
-	"strings"
 
 	ltv "github.com/ThadThompson/ltvgo"
 )
@@ -82,14 +81,12 @@ func ltvDump(reader io.Reader) {
 
 		// String
 		if d.TypeCode == ltv.String {
-			buf := new(strings.Builder)
-			n, err := io.Copy(buf, io.LimitReader(s, int64(d.Length)))
-			if err != nil || n != int64(d.Length) {
-				abort("Unexpected EOF")
+			val, err := s.ReadValue(d)
+			if err != nil {
+				abort(fmt.Sprint(err))
 			}
-			fmt.Print("\"")
-			fmt.Print(buf.String())
-			fmt.Println("\"")
+
+			fmt.Printf("\"%s\"", val.(string))
 			continue
 		}
 
@@ -100,8 +97,8 @@ func ltvDump(reader io.Reader) {
 		// Elements
 		typeSize := uint64(d.TypeCode.Size())
 		for i := 0; i < int(d.Length); i += int(typeSize) {
-			n, err := s.Read(buf[0:typeSize])
-			if err != nil || n != int(typeSize) {
+			err := s.ReadFull(buf[0:typeSize])
+			if err != nil {
 				abort("unexpected EOF")
 			}
 

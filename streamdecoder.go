@@ -1,12 +1,17 @@
 package ltvgo
 
 import (
-	"bufio"
+	"bytes"
 	"encoding/binary"
 	"io"
+	"math"
+	"unicode/utf8"
 )
 
 type LtvElementRole int
+
+const defaultMaxValueLen = 1024 * 1024
+const defaultBufferSize = 64
 
 const (
 	RoleValue LtvElementRole = iota
@@ -107,7 +112,7 @@ func (s *stackTracker) processTag(d *LtvElementDesc) error {
 }
 
 type StreamDecoder struct {
-	r *bufio.Reader
+	r io.Reader
 
 	// Read offset in the byte stream
 	offset int
@@ -117,32 +122,49 @@ type StreamDecoder struct {
 
 	// If set to true, will return NOP tags.
 	ReturnNops bool
+
+	// The maximum length supported by the ReadValue function
+	MaxValueLength uint64
 }
 
 func NewStreamDecoder(r io.Reader) *StreamDecoder {
+
 	return &StreamDecoder{
-		r:          bufio.NewReader(r),
-		offset:     0,
-		ReturnNops: false,
+		r:              r,
+		offset:         0,
+		ReturnNops:     false,
+		MaxValueLength: defaultMaxValueLen,
 	}
+}
+
+func NewStreamDecoderBytes(buf []byte) *StreamDecoder {
+	return NewStreamDecoder(bytes.NewReader(buf))
 }
 
 // Read a byte from the underlying stream and return the byte or error.
 func (s *StreamDecoder) ReadByte() (byte, error) {
-	b, err := s.r.ReadByte()
-	if err == nil {
-		s.offset++
+	var buf [1]byte
+	_, err := s.r.Read(buf[:])
+	if err != nil {
+		return 0, err
 	}
-	return b, err
+
+	s.offset++
+	return buf[0], err
 }
 
 // Read into buffer from the underlying stream.
 func (s *StreamDecoder) Read(buf []byte) (int, error) {
 	n, err := s.r.Read(buf)
-	if err == nil {
-		s.offset += n
-	}
+	s.offset += n
 	return n, err
+}
+
+// Read the full size of the buffer from the underlying stream.
+func (s *StreamDecoder) ReadFull(buf []byte) error {
+	n, err := io.ReadFull(s.r, buf)
+	s.offset += n
+	return err
 }
 
 // Read the next tag or tag and length prefix from the stream.
@@ -195,9 +217,9 @@ func (s *StreamDecoder) Next() (LtvElementDesc, error) {
 	// For a vector element, read the length field
 	lenSize := 1 << (d.SizeCode - Size1)
 
-	n, err := s.Read(buf[0:lenSize])
-	if err != nil || n != lenSize {
-		return d, io.ErrUnexpectedEOF
+	err = s.ReadFull(buf[0:lenSize])
+	if err != nil {
+		return d, err
 	}
 
 	d.ValueOffset = d.TagOffset + 1 + lenSize
@@ -223,12 +245,350 @@ func (s *StreamDecoder) Next() (LtvElementDesc, error) {
 	return d, nil
 }
 
+// Read the next value from a data stream.
+func (s *StreamDecoder) Value() (any, error) {
+	d, err := s.Next()
+	if err != nil {
+		return nil, err
+	}
+	return s.ReadValue(d)
+}
+
+// Read a single (generic) value from a data stream based on the passed descriptor.
+func (s *StreamDecoder) ReadValue(d LtvElementDesc) (any, error) {
+
+	// Handle single tag elements
+	switch d.TypeCode {
+	case Nil:
+		return nil, nil
+	case Struct:
+		return s.ReadStruct()
+	case List:
+		return s.ReadList()
+	case End:
+		return nil, errExpectedValue
+	}
+
+	if d.Length > s.MaxValueLength {
+		return nil, errMaxValueLenExceeded
+	}
+
+	// TODO: handle this buffer/allocating in a more performant manner
+	val := make([]byte, d.Length)
+	err := s.ReadFull(val)
+	if err != nil {
+		return nil, err
+	}
+
+	typeSize := d.TypeCode.Size()
+	count := len(val) / typeSize
+
+	switch d.TypeCode {
+	case String:
+		if !utf8.Valid(val) {
+			return nil, errBadUtf8
+		}
+		return string(val), nil
+
+	case Bool:
+		if d.SizeCode == SizeSingle {
+			return val[0] != 0, nil
+		} else {
+			vec := make([]bool, len(val))
+			for i, v := range val {
+				vec[i] = v != 0
+			}
+			return vec, nil
+		}
+
+	case U8:
+		if d.SizeCode == SizeSingle {
+			return uint8(val[0]), nil
+		} else {
+			return val, nil
+		}
+
+	case U16:
+		if d.SizeCode == SizeSingle {
+			return binary.LittleEndian.Uint16(val), nil
+		} else {
+			vec := make([]uint16, count)
+			for i := 0; i < count; i++ {
+				idx := i * typeSize
+				vec[i] = binary.LittleEndian.Uint16(val[idx : idx+typeSize])
+			}
+			return vec, nil
+		}
+
+	case U32:
+		if d.SizeCode == SizeSingle {
+			return binary.LittleEndian.Uint32(val), nil
+		} else {
+			vec := make([]uint32, count)
+			for i := 0; i < count; i++ {
+				idx := i * typeSize
+				vec[i] = binary.LittleEndian.Uint32(val[idx : idx+typeSize])
+			}
+			return vec, nil
+		}
+
+	case U64:
+		if d.SizeCode == SizeSingle {
+			return binary.LittleEndian.Uint64(val), nil
+		} else {
+			vec := make([]uint64, count)
+			for i := 0; i < count; i++ {
+				idx := i * typeSize
+				vec[i] = binary.LittleEndian.Uint64(val[idx : idx+typeSize])
+			}
+			return vec, nil
+		}
+
+	case I8:
+		if d.SizeCode == SizeSingle {
+			return int8(val[0]), nil
+		} else {
+			vec := make([]int8, count)
+			for i := 0; i < count; i++ {
+				vec[i] = int8(val[i])
+			}
+			return vec, nil
+		}
+
+	case I16:
+		if d.SizeCode == SizeSingle {
+			return int16(binary.LittleEndian.Uint16(val)), nil
+		} else {
+			vec := make([]int16, count)
+			for i := 0; i < count; i++ {
+				idx := i * typeSize
+				vec[i] = int16(binary.LittleEndian.Uint16(val[idx : idx+typeSize]))
+			}
+			return vec, nil
+		}
+
+	case I32:
+		if d.SizeCode == SizeSingle {
+			return int32(binary.LittleEndian.Uint32(val)), nil
+		} else {
+			vec := make([]int32, count)
+			for i := 0; i < count; i++ {
+				idx := i * typeSize
+				vec[i] = int32(binary.LittleEndian.Uint32(val[idx : idx+typeSize]))
+			}
+			return vec, nil
+		}
+
+	case I64:
+		if d.SizeCode == SizeSingle {
+			return int64(binary.LittleEndian.Uint64(val)), nil
+		} else {
+			vec := make([]int64, count)
+			for i := 0; i < count; i++ {
+				idx := i * typeSize
+				vec[i] = int64(binary.LittleEndian.Uint64(val[idx : idx+typeSize]))
+			}
+			return vec, nil
+		}
+
+	case F32:
+		if d.SizeCode == SizeSingle {
+			return math.Float32frombits(binary.LittleEndian.Uint32(val)), nil
+		} else {
+			vec := make([]float32, count)
+			for i := 0; i < count; i++ {
+				idx := i * typeSize
+				vec[i] = math.Float32frombits(binary.LittleEndian.Uint32(val[idx : idx+typeSize]))
+			}
+			return vec, nil
+		}
+
+	case F64:
+		if d.SizeCode == SizeSingle {
+			return math.Float64frombits(binary.LittleEndian.Uint64(val)), nil
+		} else {
+			vec := make([]float64, count)
+			for i := 0; i < count; i++ {
+				idx := i * typeSize
+				vec[i] = math.Float64frombits(binary.LittleEndian.Uint64(val[idx : idx+typeSize]))
+			}
+			return vec, nil
+		}
+	}
+
+	// This should not be reachable
+	panic("Expected value type")
+}
+
+// Read a list value from the data stream as a generic []any list.
+func (s *StreamDecoder) ReadList() ([]any, error) {
+	var l = make([]any, 0)
+
+	for {
+		desc, err := s.Next()
+		if err != nil {
+			return l, err
+		}
+
+		if desc.TypeCode == End {
+			break
+		}
+
+		val, err := s.ReadValue(desc)
+		if err != nil {
+			return l, err
+		}
+
+		l = append(l, val)
+	}
+
+	return l, nil
+}
+
+// Read a struct value from the data stream as an LtvMap
+func (s *StreamDecoder) ReadStruct() (*LtvStruct, error) {
+	m := NewLtvStruct()
+
+	for {
+		desc, err := s.Next()
+		if err != nil {
+			return m, err
+		}
+
+		if desc.TypeCode == End {
+			break
+		}
+
+		key, err := s.ReadValue(desc)
+		if err != nil {
+			return m, err
+		}
+
+		desc, err = s.Next()
+		if err != nil {
+			return m, err
+		}
+
+		value, err := s.ReadValue(desc)
+		if err != nil {
+			return m, err
+		}
+
+		err = m.Set(key.(string), value)
+		if err != nil {
+			return m, err
+		}
+	}
+
+	return m, nil
+}
+
 // Skip the value of a tag
 func (s *StreamDecoder) SkipValue(d LtvElementDesc) error {
-	n, err := s.r.Discard(int(d.Length))
-	if err != nil {
-		return err
+
+	// TODO: reuse internal buffer
+	var err error = nil
+	var buf [64]byte
+
+	n := int(d.Length)
+	for n > 0 && err == nil {
+		var nn, minN int
+		minN = 64
+		if n < minN {
+			minN = n
+		}
+
+		nn, err = s.r.Read(buf[:minN])
+		n -= nn
 	}
-	s.offset += n
+
+	return err
+}
+
+// Skip the value currently under the scanner
+func (s *StreamDecoder) Skip(d LtvElementDesc) error {
+
+	// For a data element or vector with a fixed size, just move the stream position past it.
+	if d.Length > 0 {
+		s.SkipValue(d)
+	}
+
+	if d.TypeCode == List || d.TypeCode == Struct {
+		startNest := len(s.tracker.stack)
+		for startNest <= len(s.tracker.stack) {
+			d, err := s.Next()
+			if err != nil {
+				return err
+			}
+
+			if d.Length > 0 {
+				s.SkipValue(d)
+			}
+		}
+	}
+
+	return nil
+}
+
+// Skip the value currently under the scanner with additional validation checks.
+// Current implementation is inefficient to the point of being an abomination.
+// It should be refactored with fire...
+func (s *StreamDecoder) ValidateAndSkip(d LtvElementDesc) error {
+
+	// Check string validity
+	if d.TypeCode == String {
+		_, err := s.ReadValue(d)
+		return err
+	} else if d.TypeCode == List {
+		for {
+			desc, err := s.Next()
+			if err != nil {
+				return err
+			}
+
+			if desc.TypeCode == End {
+				break
+			}
+
+			if err := s.ValidateAndSkip(desc); err != nil {
+				return err
+			}
+		}
+	} else if d.TypeCode == Struct {
+		// Using a value map to keep track of, and validate keys.
+		m := NewLtvStruct()
+		for {
+			desc, err := s.Next()
+			if err != nil {
+				return err
+			}
+
+			if desc.TypeCode == End {
+				break
+			}
+
+			key, err := s.ReadValue(desc)
+			if err != nil {
+				return err
+			}
+
+			err = m.Set(key.(string), nil)
+			if err != nil {
+				return err
+			}
+
+			desc, err = s.Next()
+			if err != nil {
+				return err
+			}
+
+			if err := s.ValidateAndSkip(desc); err != nil {
+				return err
+			}
+		}
+	} else if d.Length > 0 {
+		return s.SkipValue(d)
+	}
+
 	return nil
 }

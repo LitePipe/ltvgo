@@ -80,10 +80,11 @@ func Ltv2Json(reader io.Reader, writer io.Writer, prettyPrint bool) error {
 
 		case ltv.String:
 			w.WriteRune('"')
-			n, err := io.Copy(w, io.LimitReader(s, int64(d.Length)))
-			if err != nil || n != int64(d.Length) {
-				return io.ErrUnexpectedEOF
+			val, err := s.ReadValue(d)
+			if err != nil {
+				return err
 			}
+			w.WriteString(val.(string))
 			w.WriteRune('"')
 		}
 
@@ -99,9 +100,9 @@ func Ltv2Json(reader io.Reader, writer io.Writer, prettyPrint bool) error {
 		// Elements
 		for i := 0; i < int(d.Length); i += int(typeSize) {
 
-			n, err := s.Read(buf[0:typeSize])
-			if err != nil || n != int(typeSize) {
-				return io.ErrUnexpectedEOF
+			err := s.ReadFull(buf[0:typeSize])
+			if err != nil {
+				return err
 			}
 
 			if i > 0 {

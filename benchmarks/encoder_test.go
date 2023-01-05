@@ -29,6 +29,8 @@ type LtvEncoder interface {
 	WriteInt(int64)
 	WriteUint(uint64)
 	WriteString(string)
+	WriteBytes([]byte)
+
 	WriteVecBool([]bool)
 	WriteVecU8([]uint8)
 	WriteVecU16([]uint16)
@@ -71,7 +73,7 @@ func encodeMedium(e LtvEncoder) {
 	e.WriteStructEnd()
 }
 
-func Benchmark_Encoder_Small(b *testing.B) {
+func BenchmarkEncoderSmall(b *testing.B) {
 	var e ltv.Encoder
 	//e := ltv.NewBufEncoder()
 
@@ -81,7 +83,7 @@ func Benchmark_Encoder_Small(b *testing.B) {
 	}
 }
 
-func Benchmark_EncoderStream_Small(b *testing.B) {
+func BenchmarkStreamEncoderSmall(b *testing.B) {
 	var buf bytes.Buffer
 	e := ltv.NewStreamEncoder(&buf)
 
@@ -92,7 +94,7 @@ func Benchmark_EncoderStream_Small(b *testing.B) {
 	}
 }
 
-func Benchmark_Encoder_Medium(b *testing.B) {
+func BenchmarkEncoderMedium(b *testing.B) {
 	var e ltv.Encoder
 	//e := ltv.NewBufEncoder()
 
@@ -102,7 +104,7 @@ func Benchmark_Encoder_Medium(b *testing.B) {
 	}
 }
 
-func Benchmark_EncoderStream_Medium(b *testing.B) {
+func BenchmarkStreamEncoderMedium(b *testing.B) {
 	var buf bytes.Buffer
 	e := ltv.NewStreamEncoder(&buf)
 

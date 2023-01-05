@@ -9,7 +9,11 @@ import (
 
 type Encoder struct {
 	b       bytes.Buffer
-	scratch [16]byte
+	scratch [8]byte
+}
+
+func NewBufEncoder() *Encoder {
+	return &Encoder{}
 }
 
 func (e *Encoder) Bytes() []byte {
@@ -56,38 +60,28 @@ func (e *Encoder) WriteVectorPrefix(t TypeCode, count int) {
 	lenSize := 1 << exp
 	alignmentDelta := (e.b.Len() + 1 + lenSize) & (typeSize - 1)
 
-	scratchOff := 0
-
 	// Alignment padding
 	if alignmentDelta != 0 {
 		paddingLen := typeSize - alignmentDelta
 		for i := 0; i < paddingLen; i++ {
-			e.scratch[scratchOff] = NopTag
-			scratchOff++
+			e.WriteNop()
 		}
 	}
 
 	// Tag
-	e.scratch[scratchOff] = (byte(t) << 4) | byte(lenCode)
-	scratchOff++
+	e.WriteTag(t, lenCode)
 
 	// Length
 	switch lenCode {
 	case Size1:
-		e.scratch[scratchOff] = uint8(bufLen)
-		scratchOff++
+		e.b.WriteByte(uint8(bufLen))
 	case Size2:
-		binary.LittleEndian.PutUint16(e.scratch[scratchOff:], uint16(bufLen))
-		scratchOff += 2
+		e.RawWriteUint16(uint16(bufLen))
 	case Size4:
-		binary.LittleEndian.PutUint32(e.scratch[scratchOff:], uint32(bufLen))
-		scratchOff += 4
+		e.RawWriteUint32(uint32(bufLen))
 	case Size8:
-		binary.LittleEndian.PutUint64(e.scratch[scratchOff:], uint64(bufLen))
-		scratchOff += 8
+		e.RawWriteUint64(uint64(bufLen))
 	}
-
-	e.b.Write(e.scratch[:scratchOff])
 }
 
 func (e *Encoder) WriteNop() {
@@ -238,11 +232,14 @@ func (e *Encoder) WriteVecBool(v []bool) {
 	}
 }
 
+func (e *Encoder) WriteBytes(v []byte) {
+	e.WriteVectorPrefix(U8, len(v))
+	e.b.Write(v)
+}
+
 func (e *Encoder) WriteVecU8(v []uint8) {
 	e.WriteVectorPrefix(U8, len(v))
-	for _, val := range v {
-		e.b.WriteByte(byte(val))
-	}
+	e.b.Write(v)
 }
 
 func (e *Encoder) WriteVecU16(v []uint16) {

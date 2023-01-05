@@ -281,11 +281,14 @@ func (e *StreamEncoder) WriteVecBool(v []bool) {
 	}
 }
 
+func (e *StreamEncoder) WriteBytes(v []byte) {
+	e.WriteVectorPrefix(U8, len(v))
+	e.RawWrite(v)
+}
+
 func (e *StreamEncoder) WriteVecU8(v []uint8) {
 	e.WriteVectorPrefix(U8, len(v))
-	for _, val := range v {
-		e.RawWriteByte(byte(val))
-	}
+	e.RawWrite(v)
 }
 
 func (e *StreamEncoder) WriteVecU16(v []uint16) {

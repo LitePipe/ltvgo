@@ -97,13 +97,13 @@ func benchUnmarshalLtv[T TestObject](value T, b *testing.B) {
 	}
 }
 
-func Benchmark_Ltv_Marshal_Small(b *testing.B)  { benchMarshalLtv(smallData, b) }
-func Benchmark_Ltv_Marshal_Medium(b *testing.B) { benchMarshalLtv(medData, b) }
-func Benchmark_Ltv_Marshal_Large(b *testing.B)  { benchMarshalLtv(largeData, b) }
+func BenchmarkLtvMarshalSmall(b *testing.B)  { benchMarshalLtv(smallData, b) }
+func BenchmarkLtvMarshalMedium(b *testing.B) { benchMarshalLtv(medData, b) }
+func BenchmarkLtvMarshalLarge(b *testing.B)  { benchMarshalLtv(largeData, b) }
 
-func Benchmark_Ltv_Unmarshal_Small(b *testing.B)  { benchUnmarshalLtv(smallData, b) }
-func Benchmark_Ltv_Unmarshal_Medium(b *testing.B) { benchUnmarshalLtv(medData, b) }
-func Benchmark_Ltv_Unmarshal_Large(b *testing.B)  { benchUnmarshalLtv(largeData, b) }
+func BenchmarkLtvUnmarshalSmall(b *testing.B)  { benchUnmarshalLtv(smallData, b) }
+func BenchmarkLtvUnmarshalMedium(b *testing.B) { benchUnmarshalLtv(medData, b) }
+func BenchmarkLtvUnmarshalLarge(b *testing.B)  { benchUnmarshalLtv(largeData, b) }
 
 // Comparison Benchmarks
 

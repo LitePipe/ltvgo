@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"math"
+	"unicode/utf8"
 )
 
 type Encoder struct {
@@ -212,10 +213,10 @@ func (e *Encoder) WriteUint(v uint64) {
 
 func (e *Encoder) WriteString(s string) {
 
-	// // Validation up front
-	// if !utf8.ValidString(s) {
-	// 	panic("ltv: WriteString requires a valid UTF-8 string")
-	// }
+	// Validation up front
+	if !utf8.ValidString(s) {
+		panic("ltv: WriteString requires a valid UTF-8 string")
+	}
 
 	if len(s) == 1 {
 		e.WriteTag(String, SizeSingle)

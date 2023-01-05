@@ -1,7 +1,6 @@
 package bench
 
 import (
-	json "encoding/json"
 	"math"
 	"testing"
 
@@ -98,31 +97,6 @@ func benchUnmarshalLtv[T TestObject](value T, b *testing.B) {
 	}
 }
 
-func benchMarshalJson(value any, b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_, err := json.Marshal(value)
-		if err != nil {
-			b.Fatal(err)
-		}
-	}
-}
-
-func benchUnmarshalJson[T TestObject](value T, b *testing.B) {
-	data, err := json.Marshal(value)
-	if err != nil {
-		b.Fatal(err)
-	}
-
-	var ret T
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		err := json.Unmarshal(data, &ret)
-		if err != nil {
-			b.Fatal(err)
-		}
-	}
-}
-
 func Benchmark_Ltv_Marshal_Small(b *testing.B)  { benchMarshalLtv(smallData, b) }
 func Benchmark_Ltv_Marshal_Medium(b *testing.B) { benchMarshalLtv(medData, b) }
 func Benchmark_Ltv_Marshal_Large(b *testing.B)  { benchMarshalLtv(largeData, b) }
@@ -131,10 +105,37 @@ func Benchmark_Ltv_Unmarshal_Small(b *testing.B)  { benchUnmarshalLtv(smallData,
 func Benchmark_Ltv_Unmarshal_Medium(b *testing.B) { benchUnmarshalLtv(medData, b) }
 func Benchmark_Ltv_Unmarshal_Large(b *testing.B)  { benchUnmarshalLtv(largeData, b) }
 
-func Benchmark_Json_Marshal_Small(b *testing.B)  { benchMarshalJson(smallData, b) }
-func Benchmark_Json_Marshal_Medium(b *testing.B) { benchMarshalJson(medData, b) }
-func Benchmark_Json_Marshal_Large(b *testing.B)  { benchMarshalJson(largeData, b) }
+// Comparison Benchmarks
 
-func Benchmark_Json_Unmarshal_Small(b *testing.B)  { benchUnmarshalJson(smallData, b) }
-func Benchmark_Json_Unmarshal_Medium(b *testing.B) { benchUnmarshalJson(medData, b) }
-func Benchmark_Json_Unmarshal_Large(b *testing.B)  { benchUnmarshalJson(largeData, b) }
+// func benchMarshalJson(value any, b *testing.B) {
+// 	for i := 0; i < b.N; i++ {
+// 		_, err := json.Marshal(value)
+// 		if err != nil {
+// 			b.Fatal(err)
+// 		}
+// 	}
+// }
+
+// func benchUnmarshalJson[T TestObject](value T, b *testing.B) {
+// 	data, err := json.Marshal(value)
+// 	if err != nil {
+// 		b.Fatal(err)
+// 	}
+
+// 	var ret T
+// 	b.ResetTimer()
+// 	for i := 0; i < b.N; i++ {
+// 		err := json.Unmarshal(data, &ret)
+// 		if err != nil {
+// 			b.Fatal(err)
+// 		}
+// 	}
+// }
+
+// func Benchmark_Json_Marshal_Small(b *testing.B)  { benchMarshalJson(smallData, b) }
+// func Benchmark_Json_Marshal_Medium(b *testing.B) { benchMarshalJson(medData, b) }
+// func Benchmark_Json_Marshal_Large(b *testing.B)  { benchMarshalJson(largeData, b) }
+
+// func Benchmark_Json_Unmarshal_Small(b *testing.B)  { benchUnmarshalJson(smallData, b) }
+// func Benchmark_Json_Unmarshal_Medium(b *testing.B) { benchUnmarshalJson(medData, b) }
+// func Benchmark_Json_Unmarshal_Large(b *testing.B)  { benchUnmarshalJson(largeData, b) }

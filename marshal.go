@@ -281,7 +281,7 @@ func marshalerEncoder(e *encodeState, v reflect.Value, opts encOpts) {
 		return
 	}
 
-	e.l.Write(b)
+	e.l.RawWrite(b)
 }
 
 func addrMarshalerEncoder(e *encodeState, v reflect.Value, opts encOpts) {
@@ -300,7 +300,7 @@ func addrMarshalerEncoder(e *encodeState, v reflect.Value, opts encOpts) {
 		return
 	}
 
-	e.l.Write(b)
+	e.l.RawWrite(b)
 }
 
 func textMarshalerEncoder(e *encodeState, v reflect.Value, opts encOpts) {

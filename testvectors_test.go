@@ -48,7 +48,7 @@ func processTestVectors(t *testing.T, r io.Reader, valid bool) {
 		}
 
 		// Check stream decoder
-		d := NewStreamDecoderBytes(data)
+		d := NewStreamDecoder(bytes.NewReader(data))
 
 		_, err = d.Value()
 		if valid && err != nil {

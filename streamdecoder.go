@@ -1,7 +1,6 @@
 package ltvgo
 
 import (
-	"bytes"
 	"encoding/binary"
 	"io"
 	"math"
@@ -134,10 +133,6 @@ func NewStreamDecoder(r io.Reader) *StreamDecoder {
 		ReturnNops:     false,
 		MaxValueLength: defaultMaxValueLen,
 	}
-}
-
-func NewStreamDecoderBytes(buf []byte) *StreamDecoder {
-	return NewStreamDecoder(bytes.NewReader(buf))
 }
 
 // Read a byte from the underlying stream and return the byte or error.

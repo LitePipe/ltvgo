@@ -24,7 +24,7 @@ func (e *Encoder) Reset() {
 	e.b.Reset()
 }
 
-func (e *Encoder) Write(data []byte) {
+func (e *Encoder) RawWrite(data []byte) {
 	e.b.Write(data)
 }
 

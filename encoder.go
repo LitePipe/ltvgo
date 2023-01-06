@@ -1,53 +1,77 @@
 package ltvgo
 
 import (
-	"bytes"
 	"encoding/binary"
 	"math"
 	"unicode/utf8"
 )
 
+const initialBufferSize = 64
+
 type Encoder struct {
-	b       bytes.Buffer
+	buf     []byte // The buffer holding serialized data
 	scratch [8]byte
 }
 
 func NewEncoder() *Encoder {
-	return &Encoder{}
+	return &Encoder{
+		buf: make([]byte, initialBufferSize),
+	}
 }
 
 func (e *Encoder) Bytes() []byte {
-	return e.b.Bytes()
+	return e.buf
 }
 
 func (e *Encoder) Reset() {
-	e.b.Reset()
+	e.buf = e.buf[:0]
+}
+
+// Grow the buffer to accommodate new data.
+// Returns the index where data should start being written.
+func (e *Encoder) grow(n int) int {
+	l := len(e.buf)
+
+	if n <= cap(e.buf)-l {
+		// Reslice to expand our length if we can
+		e.buf = e.buf[:l+n]
+	} else {
+		// Otherwise, grow the buffer, letting append determine how much
+		// capacity to (over)allocate.
+		e.buf = append(e.buf, make([]byte, n)...)
+	}
+
+	return l
+}
+
+func (e *Encoder) RawWriteByte(data byte) {
+	e.buf = append(e.buf, data)
 }
 
 func (e *Encoder) RawWrite(data []byte) {
-	e.b.Write(data)
+	e.buf = append(e.buf, data...)
 }
 
 // Passthrough write Uint16 endian corrected
 func (e *Encoder) RawWriteUint16(v uint16) {
 	binary.LittleEndian.PutUint16(e.scratch[:], v)
-	e.b.Write(e.scratch[0:2])
+	e.RawWrite(e.scratch[0:2])
 }
 
 // Passthrough write Uint32, endian corrected
 func (e *Encoder) RawWriteUint32(v uint32) {
 	binary.LittleEndian.PutUint32(e.scratch[:], v)
-	e.b.Write(e.scratch[0:4])
+	e.RawWrite(e.scratch[0:4])
 }
 
 // Passthrough write Uint64, endian corrected
 func (e *Encoder) RawWriteUint64(v uint64) {
 	binary.LittleEndian.PutUint64(e.scratch[:], v)
-	e.b.Write(e.scratch[0:8])
+	e.RawWrite(e.scratch[0:8])
 }
 
 func (e *Encoder) WriteTag(t TypeCode, s SizeCode) {
-	e.b.WriteByte((byte(t) << 4) | byte(s))
+	e.RawWriteByte((byte(t) << 4) | byte(s))
 }
 
 // Write the tag and length for a typed vector.
@@ -58,7 +82,7 @@ func (e *Encoder) WriteVectorPrefix(t TypeCode, count int) {
 	exp := fitStorageExponent(bufLen)
 	lenCode := SizeCode(uint8(Size1) + exp)
 	lenSize := 1 << exp
-	alignmentDelta := (e.b.Len() + 1 + lenSize) & (typeSize - 1)
+	alignmentDelta := (len(e.buf) + 1 + lenSize) & (typeSize - 1)
 
 	// Alignment padding
 	if alignmentDelta != 0 {
@@ -74,7 +98,7 @@ func (e *Encoder) WriteVectorPrefix(t TypeCode, count int) {
 	// Length
 	switch lenCode {
 	case Size1:
-		e.b.WriteByte(uint8(bufLen))
+		e.RawWriteByte(uint8(bufLen))
 	case Size2:
 		e.RawWriteUint16(uint16(bufLen))
 	case Size4:
@@ -85,7 +109,7 @@ func (e *Encoder) WriteVectorPrefix(t TypeCode, count int) {
 }
 
 func (e *Encoder) WriteNop() {
-	e.b.WriteByte(NopTag)
+	e.RawWriteByte(NopTag)
 }
 
 func (e *Encoder) WriteNil() {
@@ -112,15 +136,15 @@ func (e *Encoder) WriteBool(v bool) {
 	e.WriteTag(Bool, SizeSingle)
 
 	if v {
-		e.b.WriteByte(1)
+		e.RawWriteByte(1)
 	} else {
-		e.b.WriteByte(0)
+		e.RawWriteByte(0)
 	}
 }
 
 func (e *Encoder) WriteI8(v int8) {
 	e.WriteTag(I8, SizeSingle)
-	e.b.WriteByte(uint8(v))
+	e.RawWriteByte(uint8(v))
 }
 
 func (e *Encoder) WriteI16(v int16) {
@@ -140,7 +164,7 @@ func (e *Encoder) WriteI64(v int64) {
 
 func (e *Encoder) WriteU8(v uint8) {
 	e.WriteTag(U8, SizeSingle)
-	e.b.WriteByte(v)
+	e.RawWriteByte(v)
 }
 
 func (e *Encoder) WriteU16(v uint16) {
@@ -214,10 +238,11 @@ func (e *Encoder) WriteString(s string) {
 
 	if len(s) == 1 {
 		e.WriteTag(String, SizeSingle)
-		e.b.WriteByte(byte(s[0]))
+		e.RawWriteByte(byte(s[0]))
 	} else {
 		e.WriteVectorPrefix(String, len(s))
-		e.b.WriteString(s)
+		idx := e.grow(len(s))
+		copy(e.buf[idx:], s)
 	}
 }
 
@@ -225,82 +250,111 @@ func (e *Encoder) WriteVecBool(v []bool) {
 	e.WriteVectorPrefix(Bool, len(v))
 	for _, v := range v {
 		if v {
-			e.b.WriteByte(1)
+			e.RawWriteByte(1)
 		} else {
-			e.b.WriteByte(0)
+			e.RawWriteByte(0)
 		}
 	}
 }
 
 func (e *Encoder) WriteBytes(v []byte) {
 	e.WriteVectorPrefix(U8, len(v))
-	e.b.Write(v)
+	e.RawWrite(v)
 }
 
 func (e *Encoder) WriteVecU8(v []uint8) {
+
+	// TODO: Check this
 	e.WriteVectorPrefix(U8, len(v))
-	e.b.Write(v)
+	e.RawWrite(v)
 }
 
 func (e *Encoder) WriteVecU16(v []uint16) {
 	e.WriteVectorPrefix(U16, len(v))
+	typeSize := typeSizes[U16]
+	idx := e.grow(len(v) * typeSize)
 	for _, val := range v {
-		e.RawWriteUint16(val)
+		binary.LittleEndian.PutUint16(e.buf[idx:idx+typeSize], val)
+		idx += typeSize
 	}
 }
 
 func (e *Encoder) WriteVecU32(v []uint32) {
 	e.WriteVectorPrefix(U32, len(v))
+	typeSize := typeSizes[U32]
+	idx := e.grow(len(v) * typeSize)
 	for _, val := range v {
-		e.RawWriteUint32(val)
+		binary.LittleEndian.PutUint32(e.buf[idx:idx+typeSize], val)
+		idx += typeSize
 	}
 }
 
 func (e *Encoder) WriteVecU64(v []uint64) {
 	e.WriteVectorPrefix(U64, len(v))
+	typeSize := typeSizes[U64]
+	idx := e.grow(len(v) * typeSize)
 	for _, val := range v {
-		e.RawWriteUint64(val)
+		binary.LittleEndian.PutUint64(e.buf[idx:idx+typeSize], val)
+		idx += typeSize
 	}
 }
 
 func (e *Encoder) WriteVecI8(v []int8) {
 	e.WriteVectorPrefix(I8, len(v))
+	typeSize := typeSizes[I8]
+	idx := e.grow(len(v) * typeSize)
 	for _, val := range v {
-		e.b.WriteByte(byte(val))
+		e.buf[idx] = byte(val)
+		idx += typeSize
 	}
 }
 
 func (e *Encoder) WriteVecI16(v []int16) {
 	e.WriteVectorPrefix(I16, len(v))
+	typeSize := typeSizes[I16]
+	idx := e.grow(len(v) * typeSize)
 	for _, val := range v {
-		e.RawWriteUint16(uint16(val))
+		binary.LittleEndian.PutUint16(e.buf[idx:idx+typeSize], uint16(val))
+		idx += typeSize
 	}
 }
 
 func (e *Encoder) WriteVecI32(v []int32) {
 	e.WriteVectorPrefix(I32, len(v))
+	typeSize := typeSizes[I32]
+	idx := e.grow(len(v) * typeSize)
 	for _, val := range v {
-		e.RawWriteUint32(uint32(val))
+		binary.LittleEndian.PutUint32(e.buf[idx:idx+typeSize], uint32(val))
+		idx += typeSize
 	}
 }
 
 func (e *Encoder) WriteVecI64(v []int64) {
 	e.WriteVectorPrefix(I64, len(v))
+	typeSize := typeSizes[I64]
+	idx := e.grow(len(v) * typeSize)
 	for _, val := range v {
-		e.RawWriteUint64(uint64(val))
+		binary.LittleEndian.PutUint64(e.buf[idx:idx+typeSize], uint64(val))
+		idx += typeSize
 	}
 }
 
 func (e *Encoder) WriteVecF32(v []float32) {
 	e.WriteVectorPrefix(F32, len(v))
+	typeSize := typeSizes[F32]
+	idx := e.grow(len(v) * typeSize)
 	for _, val := range v {
-		e.RawWriteUint32(math.Float32bits(val))
+		binary.LittleEndian.PutUint32(e.buf[idx:idx+typeSize], math.Float32bits(val))
+		idx += typeSize
 	}
 }
 
 func (e *Encoder) WriteVecF64(v []float64) {
 	e.WriteVectorPrefix(F64, len(v))
+	typeSize := typeSizes[F64]
+	idx := e.grow(len(v) * typeSize)
 	for _, val := range v {
-		e.RawWriteUint64(math.Float64bits(val))
+		binary.LittleEndian.PutUint64(e.buf[idx:idx+typeSize], math.Float64bits(val))
+		idx += typeSize
 	}
 }

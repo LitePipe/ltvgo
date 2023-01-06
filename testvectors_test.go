@@ -37,8 +37,7 @@ func processTestVectors(t *testing.T, r io.Reader, valid bool) {
 		}
 
 		// Check []byte decoder
-		var bd Decoder
-		bd.Init(data)
+		bd := NewDecoder(data)
 
 		_, err = bd.Value()
 		if valid && err != nil {

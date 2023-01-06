@@ -74,7 +74,7 @@ func encodeMedium(e LtvEncoder) {
 }
 
 func BenchmarkEncoderSmall(b *testing.B) {
-	e := ltv.NewBufEncoder()
+	e := ltv.NewEncoder()
 
 	for i := 0; i < b.N; i++ {
 		e.Reset()
@@ -94,7 +94,7 @@ func BenchmarkStreamEncoderSmall(b *testing.B) {
 }
 
 func BenchmarkEncoderMedium(b *testing.B) {
-	e := ltv.NewBufEncoder()
+	e := ltv.NewEncoder()
 
 	for i := 0; i < b.N; i++ {
 		e.Reset()

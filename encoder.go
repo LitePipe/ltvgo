@@ -12,7 +12,7 @@ type Encoder struct {
 	scratch [8]byte
 }
 
-func NewBufEncoder() *Encoder {
+func NewEncoder() *Encoder {
 	return &Encoder{}
 }
 

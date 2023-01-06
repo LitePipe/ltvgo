@@ -77,7 +77,8 @@ type decodeState struct {
 }
 
 func (d *decodeState) init(data []byte) *decodeState {
-	d.decoder.Init(data)
+	d.decoder = *NewDecoder(data)
+	//d.decoder.Init(data)
 	return d
 }
 

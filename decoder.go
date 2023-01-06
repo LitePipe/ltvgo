@@ -28,8 +28,7 @@ func Valid(data []byte) bool {
 }
 
 func Validate(data []byte) error {
-	var d Decoder
-	d.Init(data)
+	d := NewDecoder(data)
 
 	for {
 		desc, err := d.Next()
@@ -142,11 +141,12 @@ type Decoder struct {
 	nStack []TypeCode
 }
 
-func (s *Decoder) Init(buf []byte) *Decoder {
-	s.buf = buf
-	s.nStack = []TypeCode{}
-	s.pos = 0
-	return s
+func NewDecoder(buf []byte) *Decoder {
+	return &Decoder{
+		buf:    buf,
+		nStack: []TypeCode{},
+		pos:    0,
+	}
 }
 
 // Check whether x + y > bound with overflow checking.

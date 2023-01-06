@@ -40,8 +40,7 @@ func FuzzDecode(f *testing.F) {
 		ltv.Valid(b)
 
 		// Single value decoder
-		var d ltv.Decoder
-		d.Init(b)
+		d := ltv.NewDecoder(b)
 		d.Value()
 
 		// Unmarshal code

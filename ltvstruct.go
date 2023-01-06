@@ -97,8 +97,8 @@ func (s *LtvStruct) MarshalLTV() ([]byte, error) {
 
 // Deserialize from a LiteVector buffer
 func (s *LtvStruct) UnmarshalLTV(buf []byte) error {
-	var d Decoder
-	d.Init(buf)
+
+	d := NewDecoder(buf)
 
 	value, err := d.Value()
 	if err != nil {

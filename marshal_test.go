@@ -243,8 +243,7 @@ func (m *selfMarshaller) MarshalLTV() ([]byte, error) {
 }
 
 func (m *selfMarshaller) UnmarshalLTV(buf []byte) error {
-	var d Decoder
-	d.Init(buf)
+	d := NewDecoder(buf)
 
 	// Just use the normal struct deserializer
 	value, err := d.Value()

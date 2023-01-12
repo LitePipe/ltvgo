@@ -266,13 +266,6 @@ func GenerateNegativeVectors(w io.Writer) {
 	e.WriteStructEnd()
 	commit()
 
-	desc("struct: {'':5} (zero length struct key)")
-	e.WriteStructStart()
-	e.WriteString("")
-	e.WriteInt(5)
-	e.WriteStructEnd()
-	commit()
-
 	desc("struct: {5:'five'} (non-string struct key)")
 	e.WriteStructStart()
 	e.WriteU8(5)

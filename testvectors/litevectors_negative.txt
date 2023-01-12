@@ -442,8 +442,6 @@ struct: {'a':} (no struct value)
 10406130
 struct: {nil:5} (nil struct key)
 1000600530
-struct: {'':5} (zero length struct key)
-104100600530
 struct: {5:'five'} (non-string struct key)
 10600541046669766530
 struct: {'0':['0', <corrupt string>

@@ -132,10 +132,10 @@ func BenchmarkLtvUnmarshalLarge(b *testing.B)  { benchUnmarshalLtv(largeData, b)
 // 	}
 // }
 
-// func Benchmark_Json_Marshal_Small(b *testing.B)  { benchMarshalJson(smallData, b) }
-// func Benchmark_Json_Marshal_Medium(b *testing.B) { benchMarshalJson(medData, b) }
-// func Benchmark_Json_Marshal_Large(b *testing.B)  { benchMarshalJson(largeData, b) }
+// func BenchmarkJsonMarshalSmall(b *testing.B)  { benchMarshalJson(smallData, b) }
+// func BenchmarkJsonMarshalMedium(b *testing.B) { benchMarshalJson(medData, b) }
+// func BenchmarkJsonMarshalLarge(b *testing.B)  { benchMarshalJson(largeData, b) }
 
-// func Benchmark_Json_Unmarshal_Small(b *testing.B)  { benchUnmarshalJson(smallData, b) }
-// func Benchmark_Json_Unmarshal_Medium(b *testing.B) { benchUnmarshalJson(medData, b) }
-// func Benchmark_Json_Unmarshal_Large(b *testing.B)  { benchUnmarshalJson(largeData, b) }
+// func BenchmarkJsonUnmarshalSmall(b *testing.B)  { benchUnmarshalJson(smallData, b) }
+// func BenchmarkJsonUnmarshalMedium(b *testing.B) { benchUnmarshalJson(medData, b) }
+// func BenchmarkJsonUnmarshalLarge(b *testing.B)  { benchUnmarshalJson(largeData, b) }

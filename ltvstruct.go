@@ -27,15 +27,15 @@ func NewLtvStruct() *LtvStruct {
 // If the key already exists in the map, an error is returned.
 func (s *LtvStruct) Set(key string, value any) error {
 
-	// Keys must be non-zero length strings
-	if len(key) == 0 {
-		return errBadKey
-	}
+	// // Keys must be non-zero length strings
+	// if len(key) == 0 {
+	// 	return errBadKey
+	// }
 
-	// Keys cannot be duplicated
-	if _, exists := s.m[key]; exists {
-		return errDuplicateKey
-	}
+	// // Keys cannot be duplicated
+	// if _, exists := s.m[key]; exists {
+	// 	return errDuplicateKey
+	// }
 
 	s.keys = append(s.keys, &key)
 	s.m[key] = value

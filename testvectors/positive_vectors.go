@@ -429,8 +429,8 @@ func GeneratePositiveVectors(w io.Writer) {
 	e.WriteVecI64(vi64)
 	commit()
 
-	desc("string 'trail'<NOP><NOP><NOP>")
-	e.WriteString("trail")
+	desc("string 'trailing nops'<NOP><NOP><NOP>")
+	e.WriteString("trailing nops")
 	e.WriteNop()
 	e.WriteNop()
 	e.WriteNop()
@@ -521,4 +521,32 @@ func GeneratePositiveVectors(w io.Writer) {
 		List: []any{"Bill", "Ted", 2, true},
 		Map:  map[string]any{"Bill": 1, "Ted": 2, "Band": "Wyld Stallyns", "Bogus": false},
 	})
+
+	////////////////////////////////////////////////////////////////////////////////
+	// On the wire oddities
+	//
+	// Patterns that are valid on-the-wire, but that may be errors in a higher level
+	// protocol, or at the application layer.
+	////////////////////////////////////////////////////////////////////////////////
+
+	desc("struct: {'':5} (zero length struct key)")
+	e.WriteStructStart()
+	e.WriteString("")
+	e.WriteInt(5)
+	e.WriteStructEnd()
+	commit()
+
+	desc("struct: {'a':1, 'b':2, 'a':3, 'a':4} (repeated struct key)")
+	e.WriteStructStart()
+	e.WriteString("a")
+	e.WriteInt(1)
+	e.WriteString("b")
+	e.WriteInt(2)
+	e.WriteString("a")
+	e.WriteInt(3)
+	e.WriteString("a")
+	e.WriteInt(4)
+	e.WriteStructEnd()
+	commit()
+
 }

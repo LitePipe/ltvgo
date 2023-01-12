@@ -17,7 +17,6 @@ var (
 	errMaxValueLenExceeded = errors.New("ltv: max value length exceeded")
 	errMaxNestingDepth     = errors.New("ltv: max nesting depth exceeded")
 	errNestingMismatch     = errors.New("ltv: mismatched struct/list end tags")
-	errDuplicateKey        = errors.New("ltv: duplicate struct key")
 	errExpectedValue       = errors.New("ltv: expected value")
 	errExpectedStruct      = errors.New("ltv: expected struct")
 )

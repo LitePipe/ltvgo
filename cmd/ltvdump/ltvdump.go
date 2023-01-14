@@ -87,6 +87,7 @@ func ltvDump(reader io.Reader) {
 			}
 
 			fmt.Printf("\"%s\"", val.(string))
+			fmt.Println()
 			continue
 		}
 

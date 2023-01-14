@@ -73,6 +73,12 @@ func encodeMedium(e LtvEncoder) {
 	e.WriteStructEnd()
 }
 
+var floatVector = []float32{111.111, 222.222, 333.333, 444.444, 555.555}
+
+func encodeVector(e LtvEncoder) {
+	e.WriteVecF32(floatVector)
+}
+
 func BenchmarkEncoderSmall(b *testing.B) {
 	e := ltv.NewEncoder()
 
@@ -110,5 +116,25 @@ func BenchmarkStreamEncoderMedium(b *testing.B) {
 		buf.Reset()
 		e.Reset()
 		encodeMedium(e)
+	}
+}
+
+func BenchmarkEncoderVector(b *testing.B) {
+	e := ltv.NewEncoder()
+
+	for i := 0; i < b.N; i++ {
+		e.Reset()
+		encodeVector(e)
+	}
+}
+
+func BenchmarkStreamEncoderVector(b *testing.B) {
+	var buf bytes.Buffer
+	e := ltv.NewStreamEncoder(&buf)
+
+	for i := 0; i < b.N; i++ {
+		buf.Reset()
+		e.Reset()
+		encodeVector(e)
 	}
 }

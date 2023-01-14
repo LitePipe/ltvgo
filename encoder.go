@@ -79,12 +79,26 @@ func (e *Encoder) WriteVectorPrefix(t TypeCode, count int) {
 
 	typeSize := typeSizes[t]
 	bufLen := uint64(typeSize * count)
-	exp := fitStorageExponent(bufLen)
+
+	// Compute the number of bytes 2^n needed to store a value and returns n.
+	// Range 0..3
+	var exp uint8
+	switch {
+	case bufLen <= math.MaxUint8:
+		exp = 0
+	case bufLen <= math.MaxUint16:
+		exp = 1
+	case bufLen <= math.MaxUint32:
+		exp = 2
+	default:
+		exp = 3
+	}
+
 	lenCode := SizeCode(uint8(Size1) + exp)
 	lenSize := 1 << exp
-	alignmentDelta := (len(e.buf) + 1 + lenSize) & (typeSize - 1)
 
 	// Alignment padding
+	alignmentDelta := (len(e.buf) + 1 + lenSize) & (typeSize - 1)
 	if alignmentDelta != 0 {
 		paddingLen := typeSize - alignmentDelta
 		for i := 0; i < paddingLen; i++ {
@@ -192,35 +206,28 @@ func (e *Encoder) WriteF64(v float64) {
 	e.RawWriteUint64(math.Float64bits(v))
 }
 
+// Write int with Goldilocks fitting
 func (e *Encoder) WriteInt(v int64) {
-	// Goldilocks fit
-	if v >= 0 {
-		// Positive
-		e.WriteUint(uint64(v))
-	} else {
-		// Negative
-		u64 := uint64(v)
-		switch {
-		case u64&i8Mask == i8Mask:
-			e.WriteI8(int8(v))
-		case u64&i16Mask == i16Mask:
-			e.WriteI16(int16(v))
-		case u64&i32Mask == i32Mask:
-			e.WriteI32(int32(v))
-		default:
-			e.WriteI64(v)
-		}
+	switch {
+	case v >= math.MinInt8 && v <= math.MaxInt8:
+		e.WriteI8(int8(v))
+	case v >= math.MinInt16 && v <= math.MaxInt16:
+		e.WriteI16(int16(v))
+	case v >= math.MinInt32 && v <= math.MaxInt32:
+		e.WriteI32(int32(v))
+	default:
+		e.WriteI64(v)
 	}
 }
 
+// Write uint with Goldilocks fitting
 func (e *Encoder) WriteUint(v uint64) {
-	// Goldilocks fit
 	switch {
-	case v&u8Mask == 0:
+	case v <= math.MaxUint8:
 		e.WriteU8(uint8(v))
-	case v&u16Mask == 0:
+	case v <= math.MaxUint16:
 		e.WriteU16(uint16(v))
-	case v&u32Mask == 0:
+	case v <= math.MaxUint32:
 		e.WriteU32(uint32(v))
 	default:
 		e.WriteU64(v)
@@ -263,8 +270,6 @@ func (e *Encoder) WriteBytes(v []byte) {
 }
 
 func (e *Encoder) WriteVecU8(v []uint8) {
-
-	// TODO: Check this
 	e.WriteVectorPrefix(U8, len(v))
 	e.RawWrite(v)
 }

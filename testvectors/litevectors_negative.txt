@@ -437,11 +437,11 @@ list: ] (hanging list_end)
 list: [[] (unclosed list)
 202030
 list: ['A', 123, [false] (unclosed list)
-204041607b20500030
+204041a07b20500030
 struct: {'a':} (no struct value)
 10406130
 struct: {nil:5} (nil struct key)
-1000600530
+1000a00530
 struct: {5:'five'} (non-string struct key)
 10600541046669766530
 struct: {'0':['0', <corrupt string>

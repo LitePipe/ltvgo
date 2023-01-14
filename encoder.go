@@ -15,7 +15,7 @@ type Encoder struct {
 
 func NewEncoder() *Encoder {
 	return &Encoder{
-		buf: make([]byte, initialBufferSize),
+		buf: make([]byte, 0, initialBufferSize),
 	}
 }
 

@@ -113,47 +113,47 @@ func GeneratePositiveVectors(w io.Writer) {
 	commit()
 
 	desc("bool[]: [true, false, false, true]")
-	e.WriteVecBool([]bool{true, false, false, true})
+	e.WriteBoolVec([]bool{true, false, false, true})
 	commit()
 
 	desc("u8[]: [1, 2, 3, 4]")
-	e.WriteVecU8([]uint8{1, 2, 3, 4})
+	e.WriteU8Vec([]uint8{1, 2, 3, 4})
 	commit()
 
 	desc("u16[]: [10, 20, 30, 40]")
-	e.WriteVecU16([]uint16{10, 20, 30, 40})
+	e.WriteU16Vec([]uint16{10, 20, 30, 40})
 	commit()
 
 	desc("u32[]: [100, 200, 300, 400]")
-	e.WriteVecU32([]uint32{100, 200, 300, 400})
+	e.WriteU32Vec([]uint32{100, 200, 300, 400})
 	commit()
 
 	desc("u64[]: [1000, 2000, 3000, 4000]")
-	e.WriteVecU64([]uint64{1000, 2000, 3000, 4000})
+	e.WriteU64Vec([]uint64{1000, 2000, 3000, 4000})
 	commit()
 
 	desc("i8[]: [-1, -2, -3, -4]")
-	e.WriteVecI8([]int8{-1, -2, -3, -4})
+	e.WriteI8Vec([]int8{-1, -2, -3, -4})
 	commit()
 
 	desc("i16[]: [-10, -20, -30, -0]")
-	e.WriteVecI16([]int16{-10, -20, -30, -40})
+	e.WriteI16Vec([]int16{-10, -20, -30, -40})
 	commit()
 
 	desc("i32[]: [-100, -200, -300, -400]")
-	e.WriteVecI32([]int32{-100, -200, -300, -400})
+	e.WriteI32Vec([]int32{-100, -200, -300, -400})
 	commit()
 
 	desc("i64[]: [-1000, -2000, -3000, -4000]")
-	e.WriteVecI64([]int64{-1000, -2000, -3000, -4000})
+	e.WriteI64Vec([]int64{-1000, -2000, -3000, -4000})
 	commit()
 
 	desc("f32[]: [111.111, 222.222, 333.333, 444.444, 555.555]")
-	e.WriteVecF32([]float32{111.111, 222.222, 333.333, 444.444, 555.555})
+	e.WriteF32Vec([]float32{111.111, 222.222, 333.333, 444.444, 555.555})
 	commit()
 
 	desc("f64[]: [111.111, 222.222, 333.333, 444.444, 555.555]")
-	e.WriteVecF64([]float64{111.111, 222.222, 333.333, 444.444, 555.555})
+	e.WriteF64Vec([]float64{111.111, 222.222, 333.333, 444.444, 555.555})
 	commit()
 
 	////////////////////////////////////////////////////////////////////////////////
@@ -398,7 +398,7 @@ func GeneratePositiveVectors(w io.Writer) {
 	for i := 0; i < 255; i++ {
 		vu8[i] = uint8(i)
 	}
-	e.WriteVecU8(vu8)
+	e.WriteU8Vec(vu8)
 	commit()
 
 	desc("u8[]: 0-255")
@@ -406,7 +406,7 @@ func GeneratePositiveVectors(w io.Writer) {
 	for i := 0; i < 256; i++ {
 		vu8[i] = uint8(i)
 	}
-	e.WriteVecU8(vu8)
+	e.WriteU8Vec(vu8)
 	commit()
 
 	desc("u32[]: 0-10, unaligned")
@@ -416,7 +416,7 @@ func GeneratePositiveVectors(w io.Writer) {
 	}
 	// Lie to the encoder about the current offset
 	e.SetOffset(3)
-	e.WriteVecU32(vu32)
+	e.WriteU32Vec(vu32)
 	commit()
 
 	desc("i64[]: 0-10, no alignment")
@@ -426,7 +426,7 @@ func GeneratePositiveVectors(w io.Writer) {
 	}
 	// Lie to the encoder about the current offset
 	e.SetOffset(6)
-	e.WriteVecI64(vi64)
+	e.WriteI64Vec(vi64)
 	commit()
 
 	desc("string 'trailing nops'<NOP><NOP><NOP>")

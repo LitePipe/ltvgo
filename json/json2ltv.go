@@ -136,9 +136,9 @@ func writeGoldiAsVector(lst *GoldiList, e *ltv.StreamEncoder) {
 	case nil:
 		// Pass
 	case []bool:
-		e.WriteVecBool(data)
+		e.WriteBoolVec(data)
 	case []float64:
-		e.WriteVecF64(data)
+		e.WriteF64Vec(data)
 	case []uint64:
 		// Goldilocks the vector type size
 		switch {
@@ -158,7 +158,7 @@ func writeGoldiAsVector(lst *GoldiList, e *ltv.StreamEncoder) {
 				e.RawWriteUint32(uint32(val))
 			}
 		default:
-			e.WriteVecU64(data)
+			e.WriteU64Vec(data)
 		}
 	case []int64:
 		switch {
@@ -178,7 +178,7 @@ func writeGoldiAsVector(lst *GoldiList, e *ltv.StreamEncoder) {
 				e.RawWriteUint32(uint32(val))
 			}
 		default:
-			e.WriteVecI64(data)
+			e.WriteI64Vec(data)
 		}
 
 	default:

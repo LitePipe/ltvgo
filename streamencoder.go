@@ -254,7 +254,7 @@ func (e *StreamEncoder) WriteString(s string) {
 	}
 }
 
-func (e *StreamEncoder) WriteVecBool(v []bool) {
+func (e *StreamEncoder) WriteBoolVec(v []bool) {
 	e.WriteVectorPrefix(Bool, len(v))
 	for _, v := range v {
 		if v {
@@ -270,68 +270,68 @@ func (e *StreamEncoder) WriteBytes(v []byte) {
 	e.RawWrite(v)
 }
 
-func (e *StreamEncoder) WriteVecU8(v []uint8) {
+func (e *StreamEncoder) WriteU8Vec(v []uint8) {
 	e.WriteVectorPrefix(U8, len(v))
 	e.RawWrite(v)
 }
 
-func (e *StreamEncoder) WriteVecU16(v []uint16) {
+func (e *StreamEncoder) WriteU16Vec(v []uint16) {
 	e.WriteVectorPrefix(U16, len(v))
 	for _, val := range v {
 		e.RawWriteUint16(val)
 	}
 }
 
-func (e *StreamEncoder) WriteVecU32(v []uint32) {
+func (e *StreamEncoder) WriteU32Vec(v []uint32) {
 	e.WriteVectorPrefix(U32, len(v))
 	for _, val := range v {
 		e.RawWriteUint32(val)
 	}
 }
 
-func (e *StreamEncoder) WriteVecU64(v []uint64) {
+func (e *StreamEncoder) WriteU64Vec(v []uint64) {
 	e.WriteVectorPrefix(U64, len(v))
 	for _, val := range v {
 		e.RawWriteUint64(val)
 	}
 }
 
-func (e *StreamEncoder) WriteVecI8(v []int8) {
+func (e *StreamEncoder) WriteI8Vec(v []int8) {
 	e.WriteVectorPrefix(I8, len(v))
 	for _, val := range v {
 		e.RawWriteByte(byte(val))
 	}
 }
 
-func (e *StreamEncoder) WriteVecI16(v []int16) {
+func (e *StreamEncoder) WriteI16Vec(v []int16) {
 	e.WriteVectorPrefix(I16, len(v))
 	for _, val := range v {
 		e.RawWriteUint16(uint16(val))
 	}
 }
 
-func (e *StreamEncoder) WriteVecI32(v []int32) {
+func (e *StreamEncoder) WriteI32Vec(v []int32) {
 	e.WriteVectorPrefix(I32, len(v))
 	for _, val := range v {
 		e.RawWriteUint32(uint32(val))
 	}
 }
 
-func (e *StreamEncoder) WriteVecI64(v []int64) {
+func (e *StreamEncoder) WriteI64Vec(v []int64) {
 	e.WriteVectorPrefix(I64, len(v))
 	for _, val := range v {
 		e.RawWriteUint64(uint64(val))
 	}
 }
 
-func (e *StreamEncoder) WriteVecF32(v []float32) {
+func (e *StreamEncoder) WriteF32Vec(v []float32) {
 	e.WriteVectorPrefix(F32, len(v))
 	for _, val := range v {
 		e.RawWriteUint32(math.Float32bits(val))
 	}
 }
 
-func (e *StreamEncoder) WriteVecF64(v []float64) {
+func (e *StreamEncoder) WriteF64Vec(v []float64) {
 	e.WriteVectorPrefix(F64, len(v))
 	for _, val := range v {
 		e.RawWriteUint64(math.Float64bits(val))

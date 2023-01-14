@@ -489,7 +489,7 @@ func encodeBoolSlice(e *encodeState, v reflect.Value, _ encOpts) {
 		panic("value not a []bool")
 	}
 
-	e.l.WriteVecBool(s)
+	e.l.WriteBoolVec(s)
 }
 
 func encodeI8Slice(e *encodeState, v reflect.Value, _ encOpts) {
@@ -503,7 +503,7 @@ func encodeI8Slice(e *encodeState, v reflect.Value, _ encOpts) {
 		panic("value not a []int8")
 	}
 
-	e.l.WriteVecI8(s)
+	e.l.WriteI8Vec(s)
 }
 
 func encodeI16Slice(e *encodeState, v reflect.Value, _ encOpts) {
@@ -517,7 +517,7 @@ func encodeI16Slice(e *encodeState, v reflect.Value, _ encOpts) {
 		panic("value not a []int16")
 	}
 
-	e.l.WriteVecI16(s)
+	e.l.WriteI16Vec(s)
 }
 
 func encodeI32Slice(e *encodeState, v reflect.Value, _ encOpts) {
@@ -531,7 +531,7 @@ func encodeI32Slice(e *encodeState, v reflect.Value, _ encOpts) {
 		panic("value not a []int32")
 	}
 
-	e.l.WriteVecI32(s)
+	e.l.WriteI32Vec(s)
 }
 
 func encodeI64Slice(e *encodeState, v reflect.Value, _ encOpts) {
@@ -545,7 +545,7 @@ func encodeI64Slice(e *encodeState, v reflect.Value, _ encOpts) {
 		panic("value not a []int64")
 	}
 
-	e.l.WriteVecI64(s)
+	e.l.WriteI64Vec(s)
 }
 
 func encodeU8Slice(e *encodeState, v reflect.Value, _ encOpts) {
@@ -559,7 +559,7 @@ func encodeU8Slice(e *encodeState, v reflect.Value, _ encOpts) {
 		panic("value not a []uint8")
 	}
 
-	e.l.WriteVecU8(s)
+	e.l.WriteU8Vec(s)
 }
 
 func encodeU16Slice(e *encodeState, v reflect.Value, _ encOpts) {
@@ -573,7 +573,7 @@ func encodeU16Slice(e *encodeState, v reflect.Value, _ encOpts) {
 		panic("value not a []uint16")
 	}
 
-	e.l.WriteVecU16(s)
+	e.l.WriteU16Vec(s)
 }
 
 func encodeU32Slice(e *encodeState, v reflect.Value, _ encOpts) {
@@ -587,7 +587,7 @@ func encodeU32Slice(e *encodeState, v reflect.Value, _ encOpts) {
 		panic("value not a []uint32")
 	}
 
-	e.l.WriteVecU32(s)
+	e.l.WriteU32Vec(s)
 }
 
 func encodeU64Slice(e *encodeState, v reflect.Value, _ encOpts) {
@@ -601,7 +601,7 @@ func encodeU64Slice(e *encodeState, v reflect.Value, _ encOpts) {
 		panic("value not a []uint64")
 	}
 
-	e.l.WriteVecU64(s)
+	e.l.WriteU64Vec(s)
 }
 
 func encodeF32Slice(e *encodeState, v reflect.Value, _ encOpts) {
@@ -615,7 +615,7 @@ func encodeF32Slice(e *encodeState, v reflect.Value, _ encOpts) {
 		panic("value not a []float32")
 	}
 
-	e.l.WriteVecF32(s)
+	e.l.WriteF32Vec(s)
 }
 
 func encodeF64Slice(e *encodeState, v reflect.Value, _ encOpts) {
@@ -629,7 +629,7 @@ func encodeF64Slice(e *encodeState, v reflect.Value, _ encOpts) {
 		panic("value not a []float64")
 	}
 
-	e.l.WriteVecF64(s)
+	e.l.WriteF64Vec(s)
 }
 
 // sliceEncoder just wraps an arrayEncoder, checking to make sure the value isn't nil.

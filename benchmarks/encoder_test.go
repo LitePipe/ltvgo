@@ -4,47 +4,11 @@ import (
 	"bytes"
 	"testing"
 
+	"github.com/ThadThompson/ltvgo"
 	ltv "github.com/ThadThompson/ltvgo"
 )
 
-type LtvEncoder interface {
-	WriteNop()
-	WriteNil()
-	WriteStructStart()
-	WriteStructEnd()
-	WriteListStart()
-	WriteListEnd()
-	WriteBool(bool)
-	WriteI8(int8)
-	WriteI16(int16)
-	WriteI32(int32)
-	WriteI64(int64)
-	WriteU8(uint8)
-	WriteU16(uint16)
-	WriteU32(uint32)
-	WriteU64(uint64)
-	WriteF32(float32)
-	WriteF64(float64)
-
-	WriteInt(int64)
-	WriteUint(uint64)
-	WriteString(string)
-	WriteBytes([]byte)
-
-	WriteVecBool([]bool)
-	WriteVecU8([]uint8)
-	WriteVecU16([]uint16)
-	WriteVecU32([]uint32)
-	WriteVecU64([]uint64)
-	WriteVecI8([]int8)
-	WriteVecI16([]int16)
-	WriteVecI32([]int32)
-	WriteVecI64([]int64)
-	WriteVecF32([]float32)
-	WriteVecF64([]float64)
-}
-
-func encodeSmall(e LtvEncoder) {
+func encodeSmall(e ltvgo.LtvEncoder) {
 	e.WriteNop()
 	e.WriteStructStart()
 	e.WriteString("A")
@@ -52,7 +16,7 @@ func encodeSmall(e LtvEncoder) {
 	e.WriteStructEnd()
 }
 
-func encodeMedium(e LtvEncoder) {
+func encodeMedium(e ltvgo.LtvEncoder) {
 	e.WriteStructStart()
 
 	e.WriteString("An I32")
@@ -75,8 +39,8 @@ func encodeMedium(e LtvEncoder) {
 
 var floatVector = []float32{111.111, 222.222, 333.333, 444.444, 555.555}
 
-func encodeVector(e LtvEncoder) {
-	e.WriteVecF32(floatVector)
+func encodeVector(e ltvgo.LtvEncoder) {
+	e.WriteF32Vec(floatVector)
 }
 
 func BenchmarkEncoderSmall(b *testing.B) {

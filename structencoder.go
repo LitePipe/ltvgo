@@ -15,7 +15,7 @@ func (s StructEncoder) StartStruct() {
 }
 
 func (s StructEncoder) EndStruct() {
-	s.enc.WriteStructStart()
+	s.enc.WriteStructEnd()
 }
 
 func (s StructEncoder) Nil(key string) {

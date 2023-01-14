@@ -394,7 +394,7 @@ func (d *decodeState) list(desc LtvDesc, v reflect.Value) error {
 	case reflect.Interface:
 		if v.NumMethod() == 0 {
 			// Decoding into nil interface? Switch to non-reflect code.
-			ai, err := d.decoder.ReadList()
+			ai, err := d.decoder.readList()
 			if err != nil {
 				return err
 			}

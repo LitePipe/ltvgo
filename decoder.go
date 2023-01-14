@@ -357,9 +357,9 @@ func (s *Decoder) ReadValue(d LtvDesc) (any, error) {
 	case Nil:
 		return nil, nil
 	case Struct:
-		return s.ReadStruct()
+		return s.readStruct()
 	case List:
-		return s.ReadList()
+		return s.readList()
 	case End:
 		return nil, errExpectedValue
 	}
@@ -509,7 +509,7 @@ func (s *Decoder) ReadValue(d LtvDesc) (any, error) {
 }
 
 // Read a list value from the data stream as a generic []any list.
-func (s *Decoder) ReadList() ([]any, error) {
+func (s *Decoder) readList() ([]any, error) {
 	var l = make([]any, 0)
 
 	for {
@@ -534,7 +534,7 @@ func (s *Decoder) ReadList() ([]any, error) {
 }
 
 // Read a struct value from the data stream as an LtvMap
-func (s *Decoder) ReadStruct() (*LtvStruct, error) {
+func (s *Decoder) readStruct() (*LtvStruct, error) {
 	m := NewLtvStruct()
 
 	for {

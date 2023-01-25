@@ -1,8 +1,12 @@
 package ltvgo
 
-import "testing"
+import (
+	"encoding/hex"
+	"fmt"
+	"testing"
+)
 
-func TestEncoder(t *testing.T) {
+func TestEncoderSimple(t *testing.T) {
 	e := NewEncoder()
 	e.WriteU8(123)
 
@@ -18,4 +22,26 @@ func TestEncoder(t *testing.T) {
 	if buf[1] != 123 {
 		t.Fatal("Unexpected value: ", buf[1])
 	}
+}
+
+func TestEncoderReset(t *testing.T) {
+	e := NewEncoder()
+	e.WriteString("12345678")
+
+	s1 := append([]byte{}, e.Bytes()...)
+	if len(s1) != 10 {
+		t.Fatal("Unexpected buf len: ", len(s1))
+	}
+
+	e.Reset()
+	e.WriteString("999")
+	s2 := e.Bytes()
+
+	if len(s2) != 5 {
+		t.Fatal("Unexpected buf len: ", len(s2))
+	}
+
+	fmt.Println(hex.EncodeToString(s1))
+	fmt.Println(hex.EncodeToString(s2))
+
 }

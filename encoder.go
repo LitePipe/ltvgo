@@ -19,6 +19,9 @@ func NewEncoder() *Encoder {
 	}
 }
 
+// Return the underlying buffer. This is only
+// valid until the next buffer modification.
+// Callers that want to hold onto this value should make a copy.
 func (e *Encoder) Bytes() []byte {
 	return e.buf
 }

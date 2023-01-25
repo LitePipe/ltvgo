@@ -469,15 +469,6 @@ func newMapEncoder(t reflect.Type) encoderFunc {
 	return me.encode
 }
 
-// func encodeByteSlice(e *encodeState, v reflect.Value, _ encOpts) {
-// 	if v.IsNil() {
-// 		e.l.WriteNil()
-// 		return
-// 	}
-
-// 	e.l.WriteBytes(v.Bytes())
-// }
-
 func encodeBoolSlice(e *encodeState, v reflect.Value, _ encOpts) {
 	if v.IsNil() {
 		e.l.WriteNil()
@@ -662,13 +653,6 @@ func (se sliceEncoder) encode(e *encodeState, v reflect.Value, opts encOpts) {
 }
 
 func newSliceEncoder(t reflect.Type) encoderFunc {
-	// Byte slices get special treatment; arrays don't.
-	// if t.Elem().Kind() == reflect.Uint8 {
-	// 	p := reflect.PointerTo(t.Elem())
-	// 	if !p.Implements(marshalerType) && !p.Implements(textMarshalerType) {
-	// 		return encodeByteSlice
-	// 	}
-	// }
 
 	switch t.Elem().Kind() {
 

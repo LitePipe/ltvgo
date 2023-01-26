@@ -26,6 +26,8 @@ invalid tag - typeCode: 0, sizeCode: 13
 0d
 invalid tag - typeCode: 0, sizeCode: 14
 0e
+invalid tag - typeCode: 0, sizeCode: 15
+0f
 invalid tag - typeCode: 1, sizeCode: 1
 11
 invalid tag - typeCode: 1, sizeCode: 2
@@ -378,8 +380,6 @@ invalid tag - typeCode: 15, sizeCode: 13
 fd
 invalid tag - typeCode: 15, sizeCode: 14
 fe
-invalid tag - typeCode: 15, sizeCode: 15
-ff
 Truncated u8
 60
 Truncated u16
@@ -409,7 +409,7 @@ Truncated struct {'a':
 Truncated list [1, 2 
 2060016002
 Truncated struct {'a': <nop><nop>
-1040610f0f
+104061ffff
 Invalid UTF-8 (first byte)
 4101f6
 Invalid UTF-8 (first byte)

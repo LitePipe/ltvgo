@@ -3,7 +3,7 @@ package ltvgo
 type TypeCode uint8
 type SizeCode uint8
 
-const NopTag byte = 0x0F
+const NopTag byte = 0xFF
 
 const (
 	Nil    TypeCode = 0

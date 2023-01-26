@@ -208,7 +208,7 @@ func (s *Decoder) Next() (LtvDesc, error) {
 	}
 
 	// For a single element, we're done reading
-	if d.SizeCode == SizeSingle {
+	if d.TypeCode <= End {
 		return d, nil
 	}
 

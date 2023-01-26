@@ -54,7 +54,7 @@ func GenerateNegativeVectors(w io.Writer) {
 		for sizeCode := int(ltv.Size8) + 1; sizeCode < 16; sizeCode++ {
 
 			// Skip the special cased NOP tag
-			if typeCode == int(ltv.Nil) && sizeCode == 0xF {
+			if typeCode == 0xF && sizeCode == 0xF {
 				continue
 			}
 

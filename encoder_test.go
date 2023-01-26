@@ -1,8 +1,6 @@
 package ltvgo
 
 import (
-	"encoding/hex"
-	"fmt"
 	"testing"
 )
 
@@ -40,8 +38,4 @@ func TestEncoderReset(t *testing.T) {
 	if len(s2) != 5 {
 		t.Fatal("Unexpected buf len: ", len(s2))
 	}
-
-	fmt.Println(hex.EncodeToString(s1))
-	fmt.Println(hex.EncodeToString(s2))
-
 }

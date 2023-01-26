@@ -231,7 +231,7 @@ func (s *StreamDecoder) Next() (LtvElementDesc, error) {
 	}
 
 	// Validate length for type
-	if d.Length%typeSize != 0 {
+	if d.Length&(typeSize-1) != 0 {
 		return d, errInvalidVectorLen
 	}
 

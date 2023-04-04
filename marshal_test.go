@@ -87,27 +87,6 @@ func TestRoundBool(t *testing.T) {
 	}
 }
 
-func TestRoundLtvMap(t *testing.T) {
-	v1 := NewLtvStruct()
-	v1.Set("z", 55)
-	v1.Set("y", "testing")
-	v1.Set("a", 123.456)
-
-	enc, err := Marshal(v1)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	var v2 LtvStruct
-	if err := Unmarshal(enc, &v2); err != nil {
-		t.Fatal(err)
-	}
-
-	if v1.String() != v2.String() {
-		t.Fatal("roundtrip mismatch")
-	}
-}
-
 func TestRoundMap(t *testing.T) {
 
 	v1 := make(map[string]any)
@@ -216,84 +195,5 @@ func TestRoundStruct(t *testing.T) {
 	// because NaN is defined to not equal any other number or itself.
 	if !reflect.DeepEqual(v1, v2) {
 		t.Fatal("v1 and v2 are not DeepEqual")
-	}
-}
-
-type selfMarshaller struct {
-	myInt  int64
-	myBool bool
-}
-
-func (m *selfMarshaller) MarshalLTV() ([]byte, error) {
-	var dataBuf bytes.Buffer
-	e := NewStreamEncoder(&dataBuf)
-
-	e.WriteStructStart()
-
-	if m.myBool {
-		e.WriteString("truely")
-	} else {
-		e.WriteString("falsely")
-	}
-	e.WriteI64(m.myInt)
-
-	e.WriteStructEnd()
-
-	return dataBuf.Bytes(), nil
-}
-
-func (m *selfMarshaller) UnmarshalLTV(buf []byte) error {
-	d := NewDecoder(buf)
-
-	// Just use the normal struct deserializer
-	value, err := d.Value()
-	if err != nil {
-		return err
-	}
-
-	s, ok := value.(*LtvStruct)
-	if !ok {
-		return errExpectedStruct
-	}
-
-	if val, ok := s.TryGet("truely"); ok {
-		m.myBool = true
-		m.myInt = val.(int64)
-	} else if val, ok := s.TryGet("falsely"); ok {
-		m.myBool = false
-		m.myInt = val.(int64)
-	} else {
-		return errExpectedValue
-	}
-
-	return nil
-}
-
-func TestRoundMarshalLtv(t *testing.T) {
-
-	type Outer struct {
-		I32s  []int32
-		Marsh selfMarshaller
-		I64s  []int64
-	}
-
-	v1 := Outer{
-		I32s:  []int32{1, 2, 3},
-		Marsh: selfMarshaller{myInt: 123, myBool: true},
-		I64s:  []int64{1, 2, 3},
-	}
-
-	enc, err := Marshal(&v1)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	var v2 Outer
-	if err := Unmarshal(enc, &v2); err != nil {
-		t.Fatal(err)
-	}
-
-	if !reflect.DeepEqual(v1, v2) {
-		t.Fatal("v1 & v2 not DeepEqual")
 	}
 }

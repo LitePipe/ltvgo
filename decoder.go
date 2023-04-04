@@ -283,8 +283,6 @@ func (s *Decoder) ValidateAndSkip(d LtvDesc) error {
 
 	// Recursively process struct items
 	if d.TypeCode == Struct {
-		// Using a value map to keep track of, and validate keys.
-		m := NewLtvStruct()
 		for {
 			desc, err := s.Next()
 			if err != nil {
@@ -295,12 +293,7 @@ func (s *Decoder) ValidateAndSkip(d LtvDesc) error {
 				break
 			}
 
-			key, err := s.ReadValue(desc)
-			if err != nil {
-				return err
-			}
-
-			err = m.Set(key.(string), nil)
+			_, err = s.ReadValue(desc)
 			if err != nil {
 				return err
 			}
@@ -533,9 +526,8 @@ func (s *Decoder) readList() ([]any, error) {
 	return l, nil
 }
 
-// Read a struct value from the data stream as an LtvMap
-func (s *Decoder) readStruct() (*LtvStruct, error) {
-	m := NewLtvStruct()
+func (s *Decoder) readStruct() (map[string]any, error) {
+	m := make(map[string]any)
 
 	for {
 		desc, err := s.Next()
@@ -562,10 +554,7 @@ func (s *Decoder) readStruct() (*LtvStruct, error) {
 			return m, err
 		}
 
-		err = m.Set(key.(string), value)
-		if err != nil {
-			return m, err
-		}
+		m[key.(string)] = value
 	}
 
 	return m, nil

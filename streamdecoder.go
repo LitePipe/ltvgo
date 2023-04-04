@@ -440,8 +440,8 @@ func (s *StreamDecoder) readList() ([]any, error) {
 }
 
 // Read a struct value from the data stream as an LtvMap
-func (s *StreamDecoder) readStruct() (*LtvStruct, error) {
-	m := NewLtvStruct()
+func (s *StreamDecoder) readStruct() (map[string]any, error) {
+	m := make(map[string]any)
 
 	for {
 		desc, err := s.Next()
@@ -468,10 +468,7 @@ func (s *StreamDecoder) readStruct() (*LtvStruct, error) {
 			return m, err
 		}
 
-		err = m.Set(key.(string), value)
-		if err != nil {
-			return m, err
-		}
+		m[key.(string)] = value
 	}
 
 	return m, nil
@@ -549,8 +546,6 @@ func (s *StreamDecoder) ValidateAndSkip(d LtvElementDesc) error {
 			}
 		}
 	} else if d.TypeCode == Struct {
-		// Using a value map to keep track of, and validate keys.
-		m := NewLtvStruct()
 		for {
 			desc, err := s.Next()
 			if err != nil {
@@ -561,12 +556,7 @@ func (s *StreamDecoder) ValidateAndSkip(d LtvElementDesc) error {
 				break
 			}
 
-			key, err := s.ReadValue(desc)
-			if err != nil {
-				return err
-			}
-
-			err = m.Set(key.(string), nil)
+			_, err = s.ReadValue(desc)
 			if err != nil {
 				return err
 			}
